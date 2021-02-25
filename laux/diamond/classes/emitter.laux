@@ -1,0 +1,35 @@
+Diamond.Core.Emitter ??= {}
+
+local Emitter = {}
+do
+  function Emitter:emit(event: string|number, ...)
+    stopif not self.events[event]
+
+    local t = self.events[event]
+    for i, e in pairs(t or {}) do
+        e(...)
+    end
+  end
+
+  function Emitter:on(event: string|number, action)
+    if (not self.events[event]) then
+      self.events[event] = {}
+    end
+
+    local level = 1
+    local trace = debug.getinfo(level, "S")
+
+    -- prevent duplication
+    local lines = tostring(trace.linedefined .. trace.lastlinedefined)
+    self.events[event][lines] = action
+  end
+
+  Emitter.__index = Emitter
+end
+
+function Diamond.Core.Emitter:register(t = {}: table)
+  setmetatable(t, Emitter)
+  t.events ??= {}
+
+  return t
+end

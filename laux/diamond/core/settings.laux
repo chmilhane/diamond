@@ -1,0 +1,7 @@
+local SETTINGS = {}
+
+SETTINGS.DefaultAnimationLength = 0.5
+
+SETTINGS.DefaultAnimationEase = (x) => return x end -- linear
+
+Diamond.Core.Settings ??= SETTINGS

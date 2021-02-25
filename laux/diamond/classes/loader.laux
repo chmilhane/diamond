@@ -1,0 +1,185 @@
+DIAMOND_SERVER = 1
+DIAMOND_CLIENT = 2
+DIAMOND_SHARED = 3
+
+local __cache = {}
+
+public class Diamond.Core.Loader
+  static defaultPackage = {
+    name = "Diamond",
+    color = Color(233, 83, 120),
+    author = "darz.",
+    contact = "http://discord.com/users/709064224252624936",
+    root = "diamond"
+  }
+
+  static defaultOptions = {
+    recursive = false,
+    filesToIgnore = {},
+    realms = {}
+  }
+
+  static logTheme = {
+    text = Color(225, 225, 225),
+
+    success = Color(61, 255, 135),
+    skipped = Color(231, 128, 124),
+  }
+
+  static realms = {
+    [DIAMOND_SERVER] = (this, path) =>
+      if (SERVER) then
+        include(path)
+      end
+    end,
+
+    [DIAMOND_CLIENT] = (this, path) =>
+      if (SERVER) then
+        AddCSLuaFile(path)
+      else
+        include(path)
+      end
+    end,
+
+    [DIAMOND_SHARED] = (this, path) =>
+      this[DIAMOND_SERVER](this, path)
+      this[DIAMOND_CLIENT](this, path)
+    end
+  }
+
+  constructor(package = {}: table)
+    self.package = table.Merge(Diamond.Core.Loader.defaultPackage, package)
+    self.loadedFiles = {}
+
+    self.startTime = SysTime()
+    self.endTime = 0
+
+    self:log("Loader initialized, waiting for instructions...")
+  end
+
+  static getCache()
+    return __cache
+  end
+
+  log(...)
+    local { color, name } = self.package
+    local { text } = Diamond.Core.Loader.logTheme
+
+    MsgC(color, `[${name}] `, SERVER and Color(137, 222, 255) or Color(255, 222, 102), "(" .. (SERVER and "SERVER" or "CLIENT") .. ") ", text, ...)
+    Msg("\n")
+  end
+
+  addFile(path: string, realm: number)
+    local { root } = self.package
+
+    local filename = string.StripExtension(root .. "/" .. path)
+    local action = Diamond.Core.Loader.realms[realm] ?? Diamond.Core.Loader.realms[DIAMOND_SHARED]
+
+    local { skipped, success } = Diamond.Core.Loader.logTheme
+
+    if (self.loadedFiles[filename]) then
+      return self:log("\t", `- ${filename}: `, skipped, "SKIPPED")
+    end
+    self.loadedFiles[filename] = true
+
+    action(Diamond.Core.Loader.realms, filename .. ".lua")
+    self:log("\t", `- ${filename}: `, success, "LOADED")
+  end
+
+  addDirectory(path: string, realm: number, options = {}: table)
+    options = table.Merge(Diamond.Core.Loader.defaultOptions, options)
+
+    local { root } = self.package
+    -- path = root .. "/" .. path
+
+    if (string.EndsWith(path, "/")) then
+      local len = #path
+      path = string.sub(path, len - 1, len)
+    end
+
+    local a, b = file.Find(root .. "/" .. path .. "/*", "LUA")
+
+    for i, v in ipairs(a or {}) do
+      local filename = string.StripExtension(v)
+
+      local shouldIgnore = options.filesToIgnore[filename] or options.filesToIgnore[v]
+      continueif shouldIgnore
+
+      local newRealm = options.realms[filename] or options.realms[v]
+
+      -- print(path .. "/" .. v)
+      self:addFile(path .. "/" .. filename, newRealm ?? realm)
+    end
+
+    for i, v in ipairs(b or {}) do
+      continueif not options.recursive
+      self:addDirectory(path .. "/" .. v, realm, options)
+    end
+  end
+
+  finish()
+    local { text, success } = Diamond.Core.Loader.logTheme
+
+    local loadedFiles = table.Count(self.loadedFiles)
+    self.endTime = SysTime() - self.startTime
+
+    self:log("Loaded ", success, loadedFiles .. " files ", text, "in ", success, math.Round(self.endTime * 1000, 3) .. " ms", text, ".")
+    __cache[#__cache + 1] = self
+  end
+end
+
+-- print(Diamond.Loader:getCache())
+
+--[[
+  class Loader
+    defaultOptions = {
+      recursive = false,
+      filesToIgnore = {},
+      realms = {}
+    }
+
+    getCache()
+      return __cache
+    end
+
+    addFile(path: string, realm: number)
+      local filename = string.StripExtension(path)
+      local action = __realms[realm] ?? __realms[DIAMOND_SHARED]
+
+      stopif __cache[filename]
+      __cache[filename] = true
+
+      action(__realms, filename .. ".lua")
+    end
+
+    addDirectory(path: string, realm: number, options = {}: table)
+      options = table.Merge(self.defaultOptions, options)
+
+      if (string.EndsWith(path, "/")) then
+        local len = #path
+        path = string.sub(path, len - 1, len)
+      end
+
+      local a, b = file.Find(path .. "/*", "LUA")
+
+      for i, v in ipairs(a or {}) do
+        local filename = string.StripExtension(v)
+
+        local shouldIgnore = options.filesToIgnore[filename] or options.filesToIgnore[v]
+        continueif shouldIgnore
+
+        local newRealm = options.realms[filename] or options.realms[v]
+
+        -- print(path .. "/" .. v)
+        self:addFile(path .. "/" .. filename, newRealm ?? realm)
+      end
+
+      for i, v in ipairs(b or {}) do
+        continueif not options.recursive
+        self:addDirectory(path .. "/" .. v, realm, options)
+      end
+    end
+  end
+
+  Diamond.Core.Loader = Loader()
+]]

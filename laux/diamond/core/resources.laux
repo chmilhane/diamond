@@ -1,0 +1,5 @@
+resource.AddSingleFile("resource/fonts/diamond/montserrat_medium.ttf")
+resource.AddSingleFile("resource/fonts/diamond/fontawesome/fa_regular_brands.otf")
+resource.AddSingleFile("resource/fonts/diamond/fontawesome/fa_light.otf")
+resource.AddSingleFile("resource/fonts/diamond/fontawesome/fa_regular.otf")
+resource.AddSingleFile("resource/fonts/diamond/fontawesome/fa_solid.otf")

@@ -1,0 +1,44 @@
+local __cache = {}
+
+public class Diamond.Core.Network
+  _get _set index
+
+  constructor(index: string)
+    self:setIndex(index)
+    self:initialize()
+  end
+
+  initialize()
+    local index = self:getIndex()
+    if (SERVER) then util.AddNetworkString(index) end
+
+    local function networkHandler(len, client)
+      -- local 
+    end
+    net.Receive(index, networkHandler)
+  end
+
+  writeInt(x: number)
+    local bits = Diamond.Network:calculateRequiredBits(x, true)
+    net.WriteInt(x, bits)
+  end
+
+  writeUInt(x: number)
+    local bits = Diamond.Network:calculateRequiredBits(x, false)
+    net.WriteUInt(x, bits)
+  end
+
+  register(index: number, action)
+
+  end
+
+  send()
+
+  end
+end
+
+-- local networkHandler = Diamond.Core.Network("monSuperAddon")
+
+-- networkHandler:register("menu", () =>
+
+-- end)

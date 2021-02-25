@@ -1,0 +1,73 @@
+public class Diamond.Theme.Core
+  constructor(defaultTheme: table)
+    self.themes = {}
+    self.defaultTheme = defaultTheme
+
+    self.active = "Default"
+    self:setActive(self.active)
+  end
+
+  getThemes()
+    return self.themes
+  end
+
+  getTheme(index)
+    if (index) then
+      return self.themes[index] ?? self.themes
+    end
+
+    return self.themes[self.active] ?? self.themes
+  end
+
+  getActive()
+    return self.active
+  end
+
+  setActive(index: string|number)
+    Diamond:emit("themeChanged", self.active, index)
+    self.active = index
+  end
+
+  get(index: string|number)
+    local theme = self:getTheme() ?? self.defaultTheme
+    return theme[index] ?? color_white
+  end
+
+  register(index: string|number, content: table)
+    content = table.Merge(self.defaultTheme, content)
+    self.themes[index] = content
+  end
+end
+
+do
+  import ThemeHandler from Diamond
+
+  ThemeHandler = Diamond.Theme.Core({
+    primary = Color(24, 26, 32),
+    secondary = Color(28, 30, 38),
+
+    text = {
+      highlight = Color(255, 255, 255),
+    },
+
+    green = Color(0, 168, 107),
+    red = Color(237, 41, 57),
+
+    radius = 3
+  })
+
+  ThemeHandler:register("Default", {})
+
+  -- ThemeHandler:register("Test", {
+  --   green = color_black
+  -- })
+
+  -- ThemeHandler:register("Test2", {})
+
+  -- ThemeHandler:setActive("Test2")
+  -- print(ThemeHandler:get("green"))
+end
+
+-- Diamond:on("themeChanged", (oldTheme, newTheme) =>
+--   print(oldTheme, newTheme)
+-- end)

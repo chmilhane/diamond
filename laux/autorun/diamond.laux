@@ -1,0 +1,47 @@
+Diamond ??= {}
+Diamond.root = "diamond"
+
+Diamond.Core ??= {}
+Diamond.Network ??= {}
+Diamond.Theme ??= {}
+Diamond.Animations ??= {}
+
+do
+	local { root } = Diamond
+
+	if (SERVER) then
+		AddCSLuaFile(root .. "/classes/loader.lua")
+		AddCSLuaFile(root .. "/classes/emitter.lua")
+	end
+
+	include(root .. "/classes/loader.lua")
+	include(root .. "/classes/emitter.lua")
+end
+
+Diamond.Core.Emitter:register(Diamond)
+Diamond:emit("loaded")
+
+do
+	local loader = Diamond.Core.Loader()
+		loader:addDirectory("core", DIAMOND_SHARED, {
+			realms = {
+				["resources"] = DIAMOND_SERVER
+			}
+		})
+		loader:addDirectory("classes", DIAMOND_SHARED, {
+			recursive = true,
+			filesToIgnore = {
+				["loader"] = true,
+				["emitter"] = true,
+			}
+		})
+		loader:addDirectory("libraries", DIAMOND_SHARED, {
+			realms = {
+				["shadows"] = DIAMOND_CLIENT
+			}
+		})
+		loader:addDirectory("utilities", DIAMOND_SHARED)
+		loader:addDirectory("animations", DIAMOND_SHARED)
+		loader:addDirectory("components", DIAMOND_CLIENT)
+	loader:finish()
+end

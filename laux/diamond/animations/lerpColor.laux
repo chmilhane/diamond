@@ -1,0 +1,25 @@
+function Diamond:LerpColor(a, b, c)
+  return Color(
+    Lerp(a, b.r, c.r),
+    Lerp(a, b.g, c.g),
+    Lerp(a, b.b, c.b)
+  )
+end
+
+public class Diamond.Animations.LerpColor extends Diamond.AnimationBase
+  constructor(index: string|number, goal: table, ...)
+    super(...)
+
+    self.animData = {
+      index = index,
+      goal = goal
+    }
+  end
+
+  onThink(anim, panel, fraction)
+    local { index, goal } = self.animData
+
+    local value = panel[index] ?? color_white
+    panel[index] = Diamond:LerpColor(fraction, value, goal)
+  end
+end
