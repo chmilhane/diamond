@@ -1,9 +1,7 @@
 local PANEL = {}
 
 local theme = Diamond.Theme
-import LerpColor from Diamond.Animations
-
-AccessorFunc(PANEL, "__radius", "Radius")
+import Lerp, LerpColor from Diamond.Animations
 
 function PANEL:Init()
     self.__states = {
@@ -17,40 +15,64 @@ function PANEL:Init()
         }
     }
 
-    self:SetState()
-    -- self:SetRadius(0)--theme:get("radius"))
+    self.checkbox = vgui.Create("DButton", self)
+    self.checkbox:Dock(LEFT)
+    self.checkbox:SetText("")
+    self.checkbox:SetWide(60)
+    self.checkbox.state = false
+    self.checkbox.color = self.__states[self.checkbox.state].color
+    self.checkbox.margin = 2
+    self.checkbox.animX = 0
+    self.checkbox.Paint = (this, w, h) =>
+        Diamond:DrawRoundedRect(h / 2, 0, 0, w, h, this.color)
+        -- Diamond:DrawCircle((w / 2) - this.animX, h / 2, (h / 2) - this.margin, theme:get("white"), 0, 360, true) --> (this.margin + this.animX)
+    end
+    self.checkbox.DoClick = (this) =>
+        this.state = not this.state ?? false
+        LerpColor("color", self.__states[this.state ?? false].color, this)
+    end
 
-    self:SetText("")
-    self:SetFont(Diamond:Font(16, { font = "Font Awesome 5 Pro Solid" }))
-    self:SetSize(60, 28)
+    self.label = vgui.Create("DLabel", self)
+    self:SetTextColor(theme:get("text"))
+    self:SetText("Checkbox")
+    self:SetFont(Diamond:Font(18))
+    self:DockLabel(RIGHT) -- (LEFT, { 10, 0, 0, 0 })
 end
 
-function PANEL:GetState()
-    return self.state ?? false
+function PANEL:GetTextColor()
+    return self.label:GetTextColor()
 end
 
-function PANEL:SetState(state = false: boolean)
-    self.state = state
-    LerpColor("color", self.__states[state].color, self)
+function PANEL:SetTextColor(color)
+    self.label:SetTextColor(color)
 end
 
-function PANEL:Toggle()
-    self:SetState(not self:GetState())
+function PANEL:GetFont()
+    return self.label.GetFont()
 end
 
-function PANEL:OnMousePressed(code)
-    self:Toggle()
+function PANEL:SetFont(font)
+    self.label:SetFont(font)
+    self.label:SizeToContents()
 end
 
-function PANEL:Paint(w, h)
-    local data = self.__states[self:GetState()]
-    local radius = self:GetRadius()
-
-    Diamond:DrawRoundedRect(radius ?? h / 2, 0, 0, w, h, self.color ?? data.color ?? theme:get("red"))
-    -- draw.RoundedBox(self:GetRadius() ?? h / 2, 0, 0, w, h, self.color ?? data.color ?? theme:get("red"))
-    -- self:DrawCircle(radius, w, h, math.Round(self.moveAnim) ?? 0, 0, 1, data.icon, theme:get("white"))
+function PANEL:GetText()
+    return self.label:GetText()
 end
 
-vgui.Register("Diamond:CheckBox", PANEL, "DButton")
+function PANEL:SetText(text)
+    self.label:SetText(text)
+    self.label:SizeToContents()
+end
+
+function PANEL:DockLabel(dock, margin)
+    self.label:Dock(dock)
+
+    if margin then
+        self.label:DockMargin(unpack(margin))
+    end
+end
+
+vgui.Register("Diamond:CheckBox", PANEL)
 
 RunConsoleCommand("diamond")
