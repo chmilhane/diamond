@@ -1,0 +1,17 @@
+public class Diamond.Animations.LerpVector extends Diamond.AnimationBase
+  constructor(index: string|number, goal: number, ...)
+    super(...)
+
+    self.animData = {
+      index = index,
+      goal = goal
+    }
+  end
+
+  onThink(anim, panel, fraction)
+    local { index, goal } = self.animData
+
+    local value = panel[index] ?? Vector()
+    panel[index] = LerpVector(fraction, value, goal)
+  end
+end

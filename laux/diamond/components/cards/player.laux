@@ -1,0 +1,36 @@
+local PANEL = {}
+
+local theme = Diamond.Theme
+
+function PANEL:Init()
+    self.avatar = vgui.Create("Diamond:Avatar", self)
+    self.avatar:Dock(LEFT)
+    self.avatar:DockMargin(8, 8, 8, 8)
+    self.avatar:SetPlayer(LocalPlayer(), 512)
+
+    local titleFont = Diamond:Font(20)
+    local subtitleFont = Diamond:Font(18)
+
+    self.content = vgui.Create("DPanel", self)
+    self.content:Dock(FILL)
+    self.content.Paint = function(this, w, h)
+        local title = LocalPlayer():Nick()
+        local subtitle = LocalPlayer():GetUserGroup()
+
+        local x = 2 -- self.avatar:GetWide() + 2
+        local y = h / 2 - draw.GetFontHeight(subtitleFont) / 2
+        draw.SimpleText(title, titleFont, x, y, theme:get("text"), 0, 1)
+        y = h / 2 + draw.GetFontHeight(subtitleFont) / 2
+        draw.SimpleText(subtitle, subtitleFont, x, y, theme:lighten("text", -0.25), 0, 1)
+    end
+end
+
+function PANEL:Paint(w, h)
+    draw.RoundedBox(theme:get("radius") / 2, 0, 0, w, h, theme:lighten("background", 0.3))
+end
+
+function PANEL:PerformLayout(w, h)
+    self.avatar:SetWide(h - 16)
+end
+
+vgui.Register("Diamond:Cards:Player", PANEL)

@@ -2,15 +2,15 @@ do
   local _class_0
   local _parent_0 = Diamond.AnimationBase
   local _base_0 = {
-    __name = "Diamond.Animations.LerpColor",
+    __name = "Diamond.Animations.LerpVector",
     __base = Diamond.AnimationBase.__base,
     onThink = function(self, anim, panel, fraction)
       local __lauxi0 = self.animData
       assert(__lauxi0 ~= nil, "cannot destructure nil value")
       local index, goal = __lauxi0.index, __lauxi0.goal
 
-      local value = (function() local __laux_nilish_coalescing_var = panel[index]if __laux_nilish_coalescing_var ~= nil then return __laux_nilish_coalescing_var else return color_white end end)()
-      panel[index] = Diamond.Theme:lerp(fraction, value, goal)
+      local value = (function() local __laux_nilish_coalescing_var = panel[index]if __laux_nilish_coalescing_var ~= nil then return __laux_nilish_coalescing_var else return Vector()end end)()
+      panel[index] = LerpVector(fraction, value, goal)
     end,
     __type = function(self)
       return self.__name
@@ -23,8 +23,8 @@ do
       local __laux_type = (istable(index) and index.__type and index:__type()) or type(index)
       assert(__laux_type == "string" or __laux_type == "number", "Expected parameter `index` to be type `string|number` instead of `" .. __laux_type .. "`")
       local __laux_type = (istable(goal) and goal.__type and goal:__type()) or type(goal)
-      assert(__laux_type == "table", "Expected parameter `goal` to be type `table` instead of `" .. __laux_type .. "`")
-      Diamond.Animations.LerpColor.__parent.__init(self, ...)
+      assert(__laux_type == "number", "Expected parameter `goal` to be type `number` instead of `" .. __laux_type .. "`")
+      Diamond.Animations.LerpVector.__parent.__init(self, ...)
 
       self.animData = {
         index = index,
@@ -51,5 +51,5 @@ do
   })
   if _parent_0.__inherited then _parent_0.__inherited(_parent_0, _class_0)
   end
-  Diamond.Animations.LerpColor = _class_0
+  Diamond.Animations.LerpVector = _class_0
 end

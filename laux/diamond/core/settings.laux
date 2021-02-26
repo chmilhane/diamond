@@ -2,6 +2,11 @@ local SETTINGS = {}
 
 SETTINGS.DefaultAnimationLength = 0.5
 
-SETTINGS.DefaultAnimationEase = (x) => return x end -- linear
+SETTINGS.DefaultAnimationEase = Diamond.Animations.Ease:get("inOutSine")
 
-Diamond.Core.Settings ??= SETTINGS
+SETTINGS.Materials = {
+    ["closeButton"] = Material("diamond/closeButton.png", "smooth"),
+    ["gradient"] = Material("vgui/gradient-r", "smooth"),
+}
+
+Diamond.Core.Settings = SETTINGS

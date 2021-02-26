@@ -1,44 +1,49 @@
-local __cache = {}
-
 public class Diamond.Core.Network
-  _get _set index
+	_get _set index
 
-  constructor(index: string)
-    self:setIndex(index)
-    self:initialize()
-  end
+	constructor(index: string)
+		self:setIndex(index)
+		self:initialize()
 
-  initialize()
-    local index = self:getIndex()
-    if (SERVER) then util.AddNetworkString(index) end
+		self.cache = Diamond.Cache(`Network.${index}`)
+	end
 
-    local function networkHandler(len, client)
-      -- local 
-    end
-    net.Receive(index, networkHandler)
-  end
+	initialize()
+		local index = self:getIndex()
+		if (SERVER) then
+			util.AddNetworkString(index)
+		end
 
-  writeInt(x: number)
-    local bits = Diamond.Network:calculateRequiredBits(x, true)
-    net.WriteInt(x, bits)
-  end
+		local function networkHandler(len, client)
+			local key = net.ReadUInt(6)
+			local callback = self.cache:get(key)
 
-  writeUInt(x: number)
-    local bits = Diamond.Network:calculateRequiredBits(x, false)
-    net.WriteUInt(x, bits)
-  end
+			client = client or CLIENT and LocalPlayer()
+			callback(len, client)
+		end
+		net.Receive(index, networkHandler)
+	end
 
-  register(index: number, action)
+	register(key: number, callback)
+		self.cache:store(key, callback)
+	end
 
-  end
+	--[[
+	* @param number key
+	* @param function callback
+	* @aram nil|Player|CRecipientFilter receiver
+	]]
+	send(key: number, callback, receiver)
+		local index = self:getIndex()
+		net.Start(index)
+		net.WriteUInt(key, 6)
 
-  send()
+		callback(self)
 
-  end
+		if (SERVER) then
+			net.Send(receiver)
+		else
+			net.SendToServer()
+		end
+	end
 end
-
--- local networkHandler = Diamond.Core.Network("monSuperAddon")
-
--- networkHandler:register("menu", () =>
-
--- end)

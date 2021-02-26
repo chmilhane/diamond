@@ -106,3 +106,29 @@ end
 main()
 
 hook.Add("OnScreenSizeChanged", "Diamond.ReloadShadows", main)
+
+do
+	CreateClientConVar("diamond_enableshadows", "0", true)
+
+	local _BeginShadow = Diamond.Shadows.BeginShadow
+	local _EndShadow = Diamond.Shadows.EndShadow
+
+	local function disableShadows()
+		Diamond.Shadows.BeginShadow = cam.Start2D
+		Diamond.Shadows.EndShadow = cam.End2D
+	end
+
+	cvars.AddChangeCallback("diamond_enableshadows", function(name, oldValue, newValue)
+		if (not Diamond.Shadows) then return end
+
+		if newValue == "1" then
+			Diamond.Shadows.BeginShadow = _BeginShadow
+			Diamond.Shadows.EndShadow = _EndShadow
+		else
+			disableShadows()
+		end
+	end)
+
+	if (tobool(GetConVar("diamond_enableshadows"):GetInt())) then return end
+	disableShadows()
+end

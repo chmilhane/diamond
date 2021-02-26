@@ -1,0 +1,178 @@
+--[[
+    Easing functions specify the rate of change of a parameter over time.
+     - Objects in real life don't just start and stop instantly, and almost never move at a constant speed.
+     - When we open a drawer, we first move it quickly, and slow it down as it comes out.
+     - Drop something on the floor, and it will first accelerate downwards, and then bounce back up after hitting the floor.
+
+    Source: https://easings.net/
+]]
+
+--[[
+    x = time elapsed
+]]
+
+--[[
+    How to use?
+
+    local fract = Diamond.Animations.Ease:get("linear")(x)
+    local value = Lerp(fract, from, to)
+]]
+
+local sin = math.sin
+local cos = math.cos
+local pi = math.pi
+local sqrt = math.sqrt
+local pow = math.pow
+
+--[[
+    easing constants
+]]
+
+local c1 = 1.70158
+local c3 = c1 + 1
+local c2 = c1 * 1.525
+local c4 = (2 * pi) / 3
+local c5 = (2 * pi) / 4.5
+local n1 = 7.5625
+local d1 = 2.75
+
+--[[
+    cache methods
+]]
+
+local cache = Diamond.Cache("Easing")
+
+cache:store("linear", (x) =>
+    return x
+end)
+
+cache:store("inSine", (x) =>
+    return 1 - cos((x * pi) / 2)
+end)
+
+cache:store("outSine", (x) =>
+    return sin((x * pi) / 2)
+end)
+
+cache:store("inOutSine", (x) =>
+    return -(cos(pi * x) - 1) / 2
+end)
+
+cache:store("inQuad", (x) =>
+    return x * x
+end)
+
+cache:store("outQuad", (x) =>
+    return 1 - (1 - x) * (1 - x)
+end)
+
+cache:store("inOutQuad", (x) =>
+    return x < 0.5 and 2 ^ 3 or 1 - pow(-2 * x + 2, 2) / 2
+end)
+
+cache:store("inCubic", (x) =>
+    return x * x * x
+end)
+
+cache:store("outCubic", (x) =>
+    return 1 - pow(1 - x, 3)
+end)
+
+cache:store("inOutCubic", (x) =>
+    return x < 0.5 and 4 * x * x * x or 1 - pow(-2 * x + 2, 3) / 2
+end)
+
+cache:store("inQuart", (x) =>
+    return x * x * x * x
+end)
+
+cache:store("outQuart", (x) =>
+    return 1 - pow(1 - x, 4)
+end)
+
+cache:store("inOutQuart", (x) =>
+    return x < 0.5 and 8 * x * x * x * x or 1 - pow(-2 * x + 2, 4) / 2
+end)
+
+cache:store("inQuint", (x) =>
+    return x * x * x * x * x
+end)
+
+cache:store("outQuint", (x) =>
+    return 1 - pow(1 - x, 5)
+end)
+
+cache:store("inOutQuint", (x) =>
+    return x < 0.5 and 16 * x * x * x * x * x or 1 - pow(-2 * x + 2, 5) / 2
+end)
+
+cache:store("inExpo", (x) =>
+    return x == 0 and 0 or pow(2, 10 * x - 10)
+end)
+
+cache:store("outExpo", (x) =>
+    return x == 1 and 1 or 1 - pow(2, -10 * x)
+end)
+
+cache:store("inOutExpo", (x) =>
+    return x == 0 and 0 or x == 1 and 1 or x < 0.5 and pow(2, 20 * x - 10) / 2 or (2 - pow(2, -20 * x + 10)) / 2
+end)
+
+cache:store("inCirc", (x) =>
+    return 1 - sqrt(1 - pow(x, 2))
+end)
+
+cache:store("outCirc", (x) =>
+    return sqrt(1 - pow(x - 1, 2))
+end)
+
+cache:store("inOutCirc", (x) =>
+    return x < 0.5 and (1 - sqrt(1 - pow(2 * x, 2))) / 2 or (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2
+end)
+
+cache:store("inBack", (x) =>
+    return c3 * x * x * x - c1 * x * x
+end)
+
+cache:store("outBack", (x) =>
+    return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2)
+end)
+
+cache:store("inOutBack", (x) =>
+    return x < 0.5 and (pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2 or (pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2
+end)
+
+cache:store("inElastic", (x) =>
+    return x == 0 and 0 or x == 1 and 1 or -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4)
+end)
+
+cache:store("outElastic", (x) =>
+    return x == 0 and 0 or x == 1 and 1 or pow(2, -10 * x) * sin((x * 10 - 0.75) * c4) + 1
+end)
+
+cache:store("inOutElastic", (x) =>
+    return x == 0 and 0 or x == 1 and 1 or x < 0.5 and -(pow(2, 20 * x - 10) * sin((20 * x - 11.125) * c5)) / 2 or (pow(2, -20 * x + 10) * sin((20 * x - 11.125) * c5)) / 2 + 1
+end)
+
+local function outBounce(x)
+    if (x < 1 / d1) then
+        return n1 * x * x
+    elseif (x < 2 / d1) then
+        return n1 * (x - 1.5 / d1) * x + 0.75
+    elseif (x < 2.5 / d1) then
+        return n1 * (x - 2.25 / d1) * x + 0.9375
+    else
+        return n1 * (x - 2.625 / d1) * x + 0.984375
+    end
+end
+cache:store("outBounce", outBounce)
+
+cache:store("inBounce", (x) =>
+    return 1 - outBounce(1 - x)
+end)
+
+cache:store("inOutBounce", (x) =>
+    return x < 0.5 and (1 - outBounce(1 - 2 * x)) / 2 or (1 + outBounce(2 * x - 1)) / 2
+end)
+
+Diamond.Animations.Ease = cache

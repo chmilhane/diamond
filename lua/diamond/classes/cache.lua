@@ -8,6 +8,10 @@ do
             return __cache[self.name][key] and true or false
         end,
         get = function(self, key)
+            if (not key) then
+                return __cache[self.name]
+            end
+
             return __cache[self.name][key]
         end,
         store = function(self, key, value)
@@ -45,6 +49,3 @@ do
     })
     Diamond.Cache = _class_0
 end
-
-local cache = Diamond.Cache("test")
-cache:store("hello", "world")

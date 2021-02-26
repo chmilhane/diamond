@@ -1,73 +1,128 @@
-public class Diamond.Theme.Core
-  constructor(defaultTheme: table)
-    self.themes = {}
-    self.defaultTheme = defaultTheme
+class Theme
+    COLORS = {
+        red = Color( 237, 41, 57 ),
+        orange = Color( 255, 105, 0 ),
+        yellow = Color( 255, 191, 0 ),
+        purple = Color( 106, 79, 236 ),
+        blue = Color( 14, 87, 196 ),
+        green = Color( 0, 168, 107 ),
+        cyan = Color( 32, 174, 150 ),
+        pink = Color( 247, 106, 140 ),
 
-    self.active = "Default"
-    self:setActive(self.active)
-  end
+        white = Color( 255, 255, 255 ),
+        black = Color( 0, 0, 0 ),
+    }
+    THEMES = {
+        light = {
+            background = Color( 212, 212, 212 ),
+            text = Color(12, 12, 12),
+            radius = 8,
+            text = Color( 0, 0, 0),
+        },
+        dark = {
+            background = Color(32, 32, 32),
+            text = Color(255, 255, 255),
+            radius = 8,
+            text = Color( 255, 255, 255),
+        },
+        night = {
+            background = Color( 46, 49, 56 ),
+            text = Color( 255, 255, 255 ),
+            radius = 8,
+            text = Color( 255, 255, 255),
+        },
+    }
+    _get currentColor
+    _get currentTheme
 
-  getThemes()
-    return self.themes
-  end
+    constructor()
+        local { root } = Diamond.Package
+        self.path = `${root}/theme.json`
 
-  getTheme(index)
-    if (index) then
-      return self.themes[index] ?? self.themes
+        local content = util.JSONToTable(file.Read(self.path, "DATA") or "{}")
+        self:setCurrentTheme(content.theme or "dark")
+        self:setCurrentColor(content.color or "blue")
     end
 
-    return self.themes[self.active] ?? self.themes
-  end
+    get(color)
+        return self.COLORS[color] or self.THEMES[self:getCurrentTheme()][color] or IsColor(color) and color or self.COLORS[self:getCurrentColor()]
+    end
 
-  getActive()
-    return self.active
-  end
+    lighten(color, fraction, alpha)
+        local col = self:get(color)
+        return Color(
+            col.r + col.r * fraction,
+            col.g + col.g * fraction,
+            col.b + col.b * fraction,
+            alpha and col.a + col.a * fraction or col.a
+        )
+    end
 
-  setActive(index: string|number)
-    Diamond:emit("themeChanged", self.active, index)
-    self.active = index
-  end
+    lerp(ft, f, t)
+        return Color(
+            Lerp(ft, f.r, t.r),
+            Lerp(ft, f.g, t.g),
+            Lerp(ft, f.b, t.b)
+        )
+    end
 
-  get(index: string|number)
-    local theme = self:getTheme() ?? self.defaultTheme
-    return theme[index] ?? color_white
-  end
+    alpha(color, alpha)
+        local col = self:get(color)
+        return Color(col.r, col.g, col.b, alpha)
+    end
 
-  register(index: string|number, content: table)
-    content = table.Merge(self.defaultTheme, content)
-    self.themes[index] = content
-  end
+    setCurrentColor(color)
+        stopif not self.COLORS[color]
+
+        local oldPreference = self.currentColor
+
+        self.currentColor = color
+        self:save()
+
+        Diamond:emit("colorChanged", oldPreference, color)
+
+        return self
+    end
+
+    setCurrentTheme(theme)
+        stopif not self.THEMES[theme]
+
+        local oldTheme = self.currentTheme
+
+        self.currentTheme = theme
+        self:save()
+
+        Diamond:emit("themeChanged", oldTheme, theme)
+
+        return self
+    end
+
+    getActiveTheme()
+        return self.THEMES[self:getCurrentTheme()]
+    end
+
+    -- > method used to save current settings
+    save()
+        local { root } = Diamond.Package
+
+        if not file.IsDir(root, "DATA") then
+            file.CreateDir(root)
+        end
+
+        file.Write(self.path, util.TableToJSON({
+            theme = self:getCurrentTheme(),
+            color = self:getCurrentColor()
+        }, true))
+    end
+
+    list()
+        return {
+            ["modes"] = self.THEMES,
+            ["colors"] = self.COLORS
+        }
+    end
 end
 
-do
-  import ThemeHandler from Diamond
+Diamond.Theme = Theme()
 
-  ThemeHandler = Diamond.Theme.Core({
-    primary = Color(24, 26, 32),
-    secondary = Color(28, 30, 38),
-
-    text = {
-      highlight = Color(255, 255, 255),
-    },
-
-    green = Color(0, 168, 107),
-    red = Color(237, 41, 57),
-
-    radius = 3
-  })
-
-  ThemeHandler:register("Default", {})
-
-  -- ThemeHandler:register("Test", {
-  --   green = color_black
-  -- })
-
-  -- ThemeHandler:register("Test2", {})
-
-  -- ThemeHandler:setActive("Test2")
-  -- print(ThemeHandler:get("green"))
-end
-
--- Diamond:on("themeChanged", (oldTheme, newTheme) =>
---   print(oldTheme, newTheme)
--- end)
+-- print(Diamond.Theme:get("blue"))

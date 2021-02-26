@@ -2,7 +2,11 @@ local SETTINGS = {}
 
 SETTINGS.DefaultAnimationLength = 0.5
 
-SETTINGS.DefaultAnimationEase = function(x)
-  return x end
+SETTINGS.DefaultAnimationEase = Diamond.Animations.Ease:get("inOutSine")
 
-Diamond.Core.Settings = (function() local __laux_nilish_coalescing_var = Diamond.Core.Settings if __laux_nilish_coalescing_var ~= nil then return __laux_nilish_coalescing_var else return SETTINGS end end)()
+SETTINGS.Materials = {
+    ["closeButton"] = Material("diamond/closeButton.png", "smooth"),
+    ["gradient"] = Material("vgui/gradient-r", "smooth")
+}
+
+Diamond.Core.Settings = SETTINGS

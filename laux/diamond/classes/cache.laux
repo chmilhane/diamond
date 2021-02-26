@@ -11,6 +11,10 @@ public class Diamond.Cache
     end
 
     get(key)
+        if (not key) then
+            return __cache[self.name]
+        end
+
         return __cache[self.name][key]
     end
 
@@ -30,5 +34,5 @@ public class Diamond.Cache
     end
 end
 
-local cache = Diamond.Cache("test")
-cache:store("hello", "world")
+-- local cache = Diamond.Cache("test")
+-- cache:store("hello", "world")
