@@ -2,7 +2,11 @@ local PANEL = {}
 
 local theme = Diamond.Theme
 
+AccessorFunc(PANEL, "__radius", "Radius", FORCE_NUMBER)
+
 function PANEL:Init()
+    self:SetRadius(theme:get("Radius"))
+
     self.avatar = vgui.Create("Diamond:Avatar", self)
     self.avatar:Dock(LEFT)
     self.avatar:DockMargin(8, 8, 8, 8)
@@ -26,7 +30,7 @@ function PANEL:Init()
 end
 
 function PANEL:Paint(w, h)
-    draw.RoundedBox(theme:get("radius") / 2, 0, 0, w, h, theme:lighten("background", 0.3))
+    draw.RoundedBox(self:GetRadius(), 0, 0, w, h, theme:lighten("background", 0.3))
 end
 
 function PANEL:PerformLayout(w, h)

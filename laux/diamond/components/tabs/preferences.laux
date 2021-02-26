@@ -3,10 +3,11 @@ local PANEL = {}
 local theme = Diamond.Theme
 
 function PANEL:Init()
+    local margin = 12
+
     self.scroll = vgui.Create("DScrollPanel", self)
     self.scroll:Dock(FILL)
-
-    local margin = 12
+    self.scroll:DockMargin(12, 12, 12, 12)
 
     local prefMode, prefColor = theme:getCurrentTheme(), theme:getCurrentColor()
     for i, v of theme:list() do

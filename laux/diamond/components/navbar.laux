@@ -1,3 +1,95 @@
 local PANEL = {}
 
-vgui.Register("Diamond:Navbar", PANEL, "DLabel")
+local theme = Diamond.Theme
+import LerpX, LerpW from Diamond.Animations
+
+function PANEL:Init()
+    self:SetContainer(self:GetParent())
+
+    self.active = -1
+
+    self.buttons = {}
+    self.panels = {}
+
+    self.line = vgui.Create("DPanel", self)
+    self.line:SetTall(3)
+    self.line.Paint = (this, w, h) =>
+        draw.RoundedBox(0, 0, 0, w, h, theme:get("preference"))
+    end
+end
+
+function PANEL:GetContainer()
+    return self.__container
+end
+
+function PANEL:SetContainer(container: Panel, margin = 12: number)
+    local panel = vgui.Create("Panel", container)
+    panel:Dock(FILL)
+    panel:DockMargin(margin, margin, margin, margin)
+
+    self.__container = panel
+end
+
+function PANEL:AddPanel(text: string, icon, panel = "Panel": string, options = {}: table)
+    local button = vgui.Create("Diamond:Button", self)
+    button:SetText(text)
+    button:SetLabelPosition(TEXT_ALIGN_CENTER)
+    button:SetStyle("transparent")
+    button:Dock(LEFT)
+    button:SetRadius(0)
+    button:SetFont(Diamond:Font(20))
+
+    local index = #self.buttons + 1
+    button.DoClick = (this) =>
+        self:SelectPanel(index)
+    end
+
+    self.panels[#self.panels + 1] = panel
+    self.buttons[index] = button
+end
+
+function PANEL:SelectPanel(index: number)
+    stopif index == self.active or self.animation
+
+    local container = self:GetContainer()
+    container:AlphaTo(0, 0.15, 0, function()
+        container:Clear()
+
+        local panel = self.panels[index] ?? self.panels[1]
+        if isfunction(panel) then
+            panel(container)
+        else
+            local panel = vgui.Create(panel, container)
+            panel:Dock(FILL)
+        end
+        container:AlphaTo(255, 0.15)
+    end)
+
+    local button = self.buttons[index]
+    local activeButton = self.buttons[self.active] ?? self.buttons[1] 
+    activeButton:SetChecked(false)
+    button:SetChecked(true)
+
+    self.animation = true
+
+    LerpX(button.x, self.line, 0.2, function() self.animation = nil end)
+    LerpW(button:GetWide(), self.line, 0.2, function() self.animation = nil end)
+
+    self.active = index
+end
+
+function PANEL:PerformLayout(w, h)
+    if self.line and IsValid(self.line) then
+        self.line.y = h - self.line:GetTall()
+    end
+
+    for i, v in ipairs(self.buttons) do
+        v:SetSize((w / #self.buttons) + 1, h)
+    end
+end
+
+function PANEL:Paint(w, h)
+    draw.RoundedBox(0, 0, 0, w, h, theme:lighten("background", -0.2))
+end
+
+vgui.Register("Diamond:Navbar", PANEL)

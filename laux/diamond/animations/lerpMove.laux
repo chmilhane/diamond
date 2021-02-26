@@ -1,0 +1,51 @@
+public class Diamond.Animations.LerpMove extends Diamond.AnimationBase
+  constructor(x: number, y: number, ...)
+    super(...)
+
+    self.animData = {
+      goal = Vector(x, y)
+    }
+  end
+
+  onThink(anim, panel, fraction)
+    local { goal } = self.animData
+
+    local value = Vector(panel.x, panel.y)
+    local vector = LerpVector(fraction, value, goal)
+    panel:SetPos(vector.x, vector.y)
+  end
+end
+
+public class Diamond.Animations.LerpX extends Diamond.AnimationBase
+  constructor(x: number, ...)
+    super(...)
+
+    self.animData = {
+      goal = x
+    }
+  end
+
+  onThink(anim, panel, fraction)
+    local { goal } = self.animData
+
+    local value = panel.x
+    panel.x = Lerp(fraction, value, goal)
+  end
+end
+
+public class Diamond.Animations.LerpY extends Diamond.AnimationBase
+  constructor(y: number, ...)
+    super(...)
+
+    self.animData = {
+      goal = y
+    }
+  end
+
+  onThink(anim, panel, fraction)
+    local { goal } = self.animData
+
+    local value = panel.x
+    panel.y = Lerp(fraction, value, goal)
+  end
+end

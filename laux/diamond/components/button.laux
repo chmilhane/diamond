@@ -8,7 +8,8 @@ AccessorFunc(PANEL, "__style", "Style", FORCE_STRING)
 AccessorFunc(PANEL, "__thickness", "Thickness", FORCE_NUMBER)
 AccessorFunc(PANEL, "__checked", "Checked", FORCE_BOOL)
 AccessorFunc(PANEL, "_lblPos", "LabelPosition", FORCE_NUMBER)
-AccessorFunc(PANEL, "_Icon", "Icon")
+AccessorFunc(PANEL, "_icon", "Icon")
+AccessorFunc(PANEL, "_translationY", "TranslationY", FORCE_NUMBER)
 
 function PANEL:Init()
     self:SetBackgroundColor(theme:get("blue"))
@@ -22,6 +23,7 @@ function PANEL:Init()
     self:SetText("")
     self:SetThickness(4)
     self:SetChecked(false)
+    self:SetTranslationY(0)
     -- self:SetIcon({
     --     icon = utf8.char(0xf00d),
     --     font = Diamond:Font(18, { font = "Font Awesome 5 Free Solid" }),
@@ -94,27 +96,42 @@ local styles = {
         )
         draw.RoundedBox(self:GetRadius(), 0, 0, w, h, theme:alpha(self:GetBackgroundColor(), self.alpha))
         Diamond:DrawRoundedTexturedRect(self:GetRadius() - 1, 0, 0, w, h, Diamond.Core.Settings.Materials["gradient"], theme:lighten(theme:alpha(self:GetBackgroundColor(), self.alpha), 0.5))
-    end
+    end,
+    transparent = function(self, w, h)
+        self.textColor = theme:lerp(
+            FrameTime() * 8,
+            self.textColor or theme:lighten("white", -0.3), 
+            (self:IsDown() or self:GetChecked()) and theme:get("white") or self:IsHovered() and theme:lighten("white", -0.15) or theme:lighten("white", -0.3)
+        )
+        return self.textColor
+    end,
 }
 function PANEL:Paint(w, h)
     local style = styles[self:GetStyle()] or styles["default"]
-    style(self, w, h)
+    self.curTranslation = Lerp(FrameTime() * 8, self.curTranslation or 0, self:IsDown() and self:GetTranslationY() * 1.5 or self:IsHovered() and self:GetTranslationY() or 0)
+
+    local m = Matrix()
+    m:SetTranslation(Vector(0, self.curTranslation, 0))
 
     local x, y = self:CalculateLabelPosition(w, h)
-    local icon = self:GetIcon()
-    draw.SimpleText(self:GetText(), self:GetFont(), x + (icon and 12 or 0), y, theme:get("white"), self:GetLabelPosition(), 1)
+    cam.PushModelMatrix(m)
+        local textColor = style(self, w, h)
 
-    if icon then
-        draw.SimpleText(icon.icon,
-            icon.font, 
-            self:GetLabelPosition() == TEXT_ALIGN_RIGHT and x + 20
-                or self:GetLabelPosition() == TEXT_ALIGN_LEFT and x - 20
-                or x - 50, y, 
-            theme:get("white"), 
-            self:GetLabelPosition(),
-            1
-        )
-    end
+        local icon = self:GetIcon()
+        draw.SimpleText(self:GetText(), self:GetFont(), x + (icon and 12 or 0), y, textColor ?? theme:get("white"), self:GetLabelPosition(), 1)
+        if icon then
+            draw.SimpleText(icon.icon,
+                icon.font, 
+                self:GetLabelPosition() == TEXT_ALIGN_RIGHT and x + 20
+                    or self:GetLabelPosition() == TEXT_ALIGN_LEFT and x - 20
+                    or x - 50, 
+                y, 
+                theme:get("white"), 
+                self:GetLabelPosition(),
+                1
+            )
+        end
+    cam.PopModelMatrix()
 end
 
 vgui.Register("Diamond:Button", PANEL, "DLabel")

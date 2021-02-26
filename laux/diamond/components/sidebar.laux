@@ -5,6 +5,7 @@ local theme = Diamond.Theme
 
 function PANEL:Init()
     self:SetContainer(self:GetParent())
+    self:GetVBar():SetWide(0)
 
     self.active = -1
 
@@ -36,7 +37,7 @@ function PANEL:AddCard(panel = "Panel": string|Panel, tall = 60, custom = functi
     return card
 end
 
-function PANEL:AddPanel(text: string, icon, panel = "Panel": string, options = {}: table)
+function PANEL:AddPanel(text: string, icon, panel = "Panel", options = {}: table)
     local button = vgui.Create("Diamond:Button", self)
     button:Dock(TOP)
     button:SetTall(45)
@@ -50,12 +51,10 @@ function PANEL:AddPanel(text: string, icon, panel = "Panel": string, options = {
 
         Diamond:on("colorChanged", (oldColor, newColor) =>
             stopif not self or not IsValid(self)
-            local buttons = self.buttons ?? {}
-
-            for i, v of buttons do
-                v:SetBackgroundColor(theme:get(theme:getCurrentColor()))
-            end
+            button:SetBackgroundColor(newColor)
         end)
+    else
+        button:SetBackgroundColor(options.BackgroundColor)
     end
 
     for i, v of options do
@@ -86,8 +85,13 @@ function PANEL:SelectPanel(index: number)
     container:AlphaTo(0, 0.15, 0, function()
         container:Clear()
 
-        local panel = vgui.Create(self.panels[index] ?? self.panels[1], container)
-        panel:Dock(FILL)
+        local panel = self.panels[index] ?? self.panels[1]
+        if isfunction(panel) then
+            panel(container)
+        else    
+            local panel = vgui.Create(panel, container)
+            panel:Dock(FILL)
+        end
         container:AlphaTo(255, 0.15)
     end)
 
@@ -103,4 +107,4 @@ function PANEL:Paint(w, h)
     draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, theme:lighten("background", -0.1), false, false, true, false)
 end
 
-vgui.Register("Diamond:Sidebar", PANEL)
+vgui.Register("Diamond:Sidebar", PANEL, "DScrollPanel")

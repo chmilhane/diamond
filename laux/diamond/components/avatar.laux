@@ -19,8 +19,6 @@ function PANEL:SetSteamID(...)
 end
 
 function PANEL:Paint(w, h)
-    -- PrintTable(self.poly)
-
     Diamond:MaskStencil(() =>
         Diamond:DrawRoundedRect(self:GetRadius(), 0, 0, w, h, color_white)
     end, () =>

@@ -1,0 +1,15 @@
+local PANEL = {}
+
+function PANEL:Init()
+    self.navbar = vgui.Create("Diamond:Navbar", self)
+    self.navbar:Dock(TOP)
+    self.navbar:SetTall(50)
+    self.navbar:AddPanel("Option A", "DPanel")
+    self.navbar:AddPanel("Option B", "DPanel")
+    self.navbar:AddPanel("Option C", "DPanel")
+    self.navbar:SelectPanel(1)
+end
+
+vgui.Register("Diamond:Tabs:Dashboard", PANEL)
+
+RunConsoleCommand("diamond")
