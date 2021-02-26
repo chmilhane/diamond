@@ -150,19 +150,5 @@ local function openMenu(client)
 	sidebar:AddPanel("Dashboard", utf8.char(0xf3fd), "DPanel", { --[[ BackgroundColor = theme:get("purple"), ]] Radius = 4 })
 	sidebar:AddPanel("Preferences", utf8.char(0xf085), "Diamond:Tabs:Preferences", { --[[ BackgroundColor = theme:get("orange"), ]] Radius = 4 })
 	sidebar:SelectPanel(2)
-
-	-- local avatar = vgui.Create("Diamond:Avatar", frame)
-	-- avatar:SetSize(256, 256)
-	-- avatar:SetSteamID("76561198160451971", 256)
-	-- avatar:Center()
-
-	local button = vgui.Create("Diamond:Button", frame)
-	button:Dock(BOTTOM)
-	button:DockMargin(16, 16, 16, 16)
-	button:SetTall(45)
-	button:SetText("Continuer")
-	button:SetStyle("colorOnHover")
 end
 concommand.Add("diamond", openMenu)
-
-RunConsoleCommand("diamond")

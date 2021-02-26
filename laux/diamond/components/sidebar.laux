@@ -104,6 +104,3 @@ function PANEL:Paint(w, h)
 end
 
 vgui.Register("Diamond:Sidebar", PANEL)
-
--- stopif LocalPlayer():SteamID64() ~= "76561198415918392"
-RunConsoleCommand("diamond")

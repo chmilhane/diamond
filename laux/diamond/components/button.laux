@@ -118,5 +118,3 @@ function PANEL:Paint(w, h)
 end
 
 vgui.Register("Diamond:Button", PANEL, "DLabel")
-
-RunConsoleCommand('diamond')

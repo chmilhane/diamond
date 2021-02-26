@@ -58,5 +58,3 @@ function PANEL:Init()
 end
 
 vgui.Register("Diamond:Tabs:Preferences", PANEL)
-
-RunConsoleCommand("diamond")
