@@ -4,4 +4,16 @@ function PANEL:Init()
 
 end
 
+function PANEL:GetRadioButtons()
+    local buttons = {}
+    local name = self:GetName()
+
+    for i, v in ipairs(self:GetParent():GetChildren() or {}) do
+        continueif v:GetName() ~= name
+        buttons[#buttons + 1] = v
+    end
+
+    return buttons
+end
+
 vgui.Register("Diamond:RadioButton", PANEL, "DButton")
