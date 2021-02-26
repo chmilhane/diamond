@@ -31,6 +31,7 @@ function PANEL:Init()
     self:DockLabel(RIGHT) -- (LEFT, { 10, 0, 0, 0 })
 
     self:SetThickness(2)
+    self:SetChecked(true)
 end
 
 function PANEL:GetActive()
