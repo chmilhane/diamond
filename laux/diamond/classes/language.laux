@@ -1,0 +1,31 @@
+public class Diamond.Language
+    _get _set defaultLanguage
+    _get _set activeLanguage
+
+    constructor()
+       self.cache = {}
+
+       self:setDefaultLanguage("english")
+    end
+
+    add(index: string, content: table)
+        self.cache[index] = content
+    end
+
+    addFromFile(index: string, path: string)
+        if (SERVER) then
+            AddCSLuaFile(path)
+        end
+
+        self.cache[index] = include(path)
+    end
+
+    get(index, ...)
+        if not index then return self.cache end
+        
+        local lang = self.cache[self:getActiveLanguage()] ?? self.cache[self:getDefaultLanguage()]
+        local value = lang[index] ?? index
+
+        return value:format(...)
+    end
+end
