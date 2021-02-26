@@ -1,7 +1,7 @@
 local PANEL = {}
 
 local theme = Diamond.Theme
-import LerpColor from Diamond.Animations
+import Lerp, LerpColor from Diamond.Animations
 
 function PANEL:Init()
     self.__states = {
@@ -19,6 +19,18 @@ function PANEL:Init()
     self.checkbox:Dock(LEFT)
     self.checkbox:SetText("")
     self.checkbox:SetWide(60)
+    self.checkbox.state = false
+    self.checkbox.color = self.__states[self.checkbox.state].color
+    self.checkbox.margin = 2
+    self.checkbox.animX = 0
+    self.checkbox.Paint = (this, w, h) =>
+        Diamond:DrawRoundedRect(h / 2, 0, 0, w, h, this.color)
+        -- Diamond:DrawCircle((w / 2) - this.animX, h / 2, (h / 2) - this.margin, theme:get("white"), 0, 360, true) --> (this.margin + this.animX)
+    end
+    self.checkbox.DoClick = (this) =>
+        this.state = not this.state ?? false
+        LerpColor("color", self.__states[this.state ?? false].color, this)
+    end
 
     self.label = vgui.Create("DLabel", self)
     self:SetTextColor(theme:get("text"))
