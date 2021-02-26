@@ -100,8 +100,8 @@ local styles = {
     transparent = function(self, w, h)
         self.textColor = theme:lerp(
             FrameTime() * 8,
-            self.textColor or theme:lighten("white", -0.3), 
-            (self:IsDown() or self:GetChecked()) and theme:get("white") or self:IsHovered() and theme:lighten("white", -0.15) or theme:lighten("white", -0.3)
+            self.textColor or theme:lighten("text", -0.3), 
+            (self:IsDown() or self:GetChecked()) and theme:get("text") or self:IsHovered() and theme:lighten("text", -0.15) or theme:lighten("text", -0.3)
         )
         return self.textColor
     end,

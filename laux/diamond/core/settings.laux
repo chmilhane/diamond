@@ -2,7 +2,7 @@ local SETTINGS = {}
 
 SETTINGS.DefaultAnimationLength = 0.5
 
-SETTINGS.DefaultAnimationEase = Diamond.Animations.Ease:get("inOutSine")
+SETTINGS.DefaultAnimationEase = Diamond.Animations.Ease:get("outQuart")
 
 SETTINGS.Materials = {
     ["closeButton"] = Material("diamond/closeButton.png", "smooth"),

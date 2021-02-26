@@ -1,15 +1,26 @@
 local PANEL = {}
 
+local theme = Diamond.Theme
+
 function PANEL:Init()
     self.navbar = vgui.Create("Diamond:Navbar", self)
     self.navbar:Dock(TOP)
     self.navbar:SetTall(50)
     self.navbar:AddPanel("Option A", "DPanel")
-    self.navbar:AddPanel("Option B", "DPanel")
-    self.navbar:AddPanel("Option C", "DPanel")
-    self.navbar:SelectPanel(1)
+    self.navbar:AddPanel("Option B", (parent) =>
+        -- local checkbox = vgui.Create("Diamond:CheckBox", parent)
+        for i = 1, 10 do
+            local rb = parent:Add("Diamond:RadioButton")
+            rb:Dock(TOP)
+        end
+
+        for _, v in ipairs( { "test1", "test2", "test3" } ) do
+            local rb = parent:Add( "RadioButton" )
+            rb:Dock( TOP )
+            rb:SetText( v )
+        end
+    end)
+    self.navbar:SelectPanel(2)
 end
 
 vgui.Register("Diamond:Tabs:Dashboard", PANEL)
-
-RunConsoleCommand("diamond")

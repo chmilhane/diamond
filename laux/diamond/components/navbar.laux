@@ -12,9 +12,9 @@ function PANEL:Init()
     self.panels = {}
 
     self.line = vgui.Create("DPanel", self)
-    self.line:SetTall(3)
     self.line.Paint = (this, w, h) =>
-        draw.RoundedBox(0, 0, 0, w, h, theme:get("preference"))
+        draw.RoundedBox(0, 0, 0, w, h, theme:alpha("black", 40))
+        draw.RoundedBox(0, 0, h - 3, w, 3, theme:get("preference"))
     end
 end
 
@@ -30,7 +30,7 @@ function PANEL:SetContainer(container: Panel, margin = 12: number)
     self.__container = panel
 end
 
-function PANEL:AddPanel(text: string, icon, panel = "Panel": string, options = {}: table)
+function PANEL:AddPanel(text: string, panel = "Panel", options = {}: table)
     local button = vgui.Create("Diamond:Button", self)
     button:SetText(text)
     button:SetLabelPosition(TEXT_ALIGN_CENTER)
@@ -40,6 +40,7 @@ function PANEL:AddPanel(text: string, icon, panel = "Panel": string, options = {
     button:SetFont(Diamond:Font(20))
 
     local index = #self.buttons + 1
+
     button.DoClick = (this) =>
         self:SelectPanel(index)
     end
@@ -72,15 +73,19 @@ function PANEL:SelectPanel(index: number)
 
     self.animation = true
 
-    LerpX(button.x, self.line, 0.2, function() self.animation = nil end)
-    LerpW(button:GetWide(), self.line, 0.2, function() self.animation = nil end)
+    timer.Simple(0, function()
+        LerpX(button.x, self.line, 0.2, function() self.animation = nil end)
+        LerpW(button:GetWide(), self.line, 0.2, function() self.animation = nil end)
+    end)
 
     self.active = index
 end
 
 function PANEL:PerformLayout(w, h)
     if self.line and IsValid(self.line) then
-        self.line.y = h - self.line:GetTall()
+        self.line:SetTall(h)
+        -- self.line.y = h - self.line:GetTall()
+        -- self.line:MoveToFront()
     end
 
     for i, v in ipairs(self.buttons) do

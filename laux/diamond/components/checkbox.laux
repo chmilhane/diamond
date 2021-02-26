@@ -1,3 +1,56 @@
 local PANEL = {}
 
-vgui.Register("Diamond:CheckBox", PANEL, "DLabel")
+local theme = Diamond.Theme
+import LerpColor from Diamond.Animations
+
+AccessorFunc(PANEL, "__radius", "Radius")
+
+function PANEL:Init()
+    self.__states = {
+        [true] = {
+            icon = utf8.char(0xf00c),
+            color = theme:get("green")
+        },
+        [false] = {
+            icon = utf8.char(0xf00d),
+            color = theme:get("red")
+        }
+    }
+
+    self:SetState()
+    -- self:SetRadius(0)--theme:get("radius"))
+
+    self:SetText("")
+    self:SetFont(Diamond:Font(16, { font = "Font Awesome 5 Pro Solid" }))
+    self:SetSize(60, 28)
+end
+
+function PANEL:GetState()
+    return self.state ?? false
+end
+
+function PANEL:SetState(state = false: boolean)
+    self.state = state
+    LerpColor("color", self.__states[state].color, self)
+end
+
+function PANEL:Toggle()
+    self:SetState(not self:GetState())
+end
+
+function PANEL:OnMousePressed(code)
+    self:Toggle()
+end
+
+function PANEL:Paint(w, h)
+    local data = self.__states[self:GetState()]
+    local radius = self:GetRadius()
+
+    Diamond:DrawRoundedRect(radius ?? h / 2, 0, 0, w, h, self.color ?? data.color ?? theme:get("red"))
+    -- draw.RoundedBox(self:GetRadius() ?? h / 2, 0, 0, w, h, self.color ?? data.color ?? theme:get("red"))
+    -- self:DrawCircle(radius, w, h, math.Round(self.moveAnim) ?? 0, 0, 1, data.icon, theme:get("white"))
+end
+
+vgui.Register("Diamond:CheckBox", PANEL, "DButton")
+
+RunConsoleCommand("diamond")
