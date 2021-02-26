@@ -1,19 +1,116 @@
 local PANEL = {}
 
-function PANEL:Init()
+local theme = Diamond.Theme
+import Lerp from Diamond.Animations
 
+AccessorFunc(PANEL, "__thickness", "Thickness", FORCE_NUMBER)
+
+function PANEL:Init()
+    self.radio = vgui.Create("DButton", self)
+    self.radio:Dock(LEFT)
+    self.radio:SetText("")
+    self.radio.Paint = (this, w, h) =>
+        local color = theme:get("text")
+
+        for i = 1, self:GetThickness() do
+            surface.DrawCircle(w / 2, h / 2, (h / 2) - i, color.r, color.g, color.b)
+        end
+
+        if self:GetChecked() then
+            Diamond:DrawCircle(w / 2, h / 2, (h / 2) / 2, theme:alpha("text", this.alpha ?? 0), 0, 360, true)
+        end
+    end
+    self.radio.DoClick = (this) =>
+        self:SetChecked(true)
+    end
+
+    self.label = vgui.Create("DLabel", self)
+    self:SetTextColor(theme:get("text"))
+    self:SetText("Radio Button")
+    self:SetFont(Diamond:Font(18))
+    self:DockLabel(RIGHT) -- (LEFT, { 10, 0, 0, 0 })
+
+    self:SetThickness(2)
 end
 
-function PANEL:GetRadioButtons()
+function PANEL:GetActive()
+    local buttons = self:GetRadioButtons()
+    for i, v in ipairs(buttons or {}) do
+        if v:GetChecked() then return true end
+    end
+end
+
+function PANEL:GetChecked()
+    return self.checked ?? false
+end
+
+function PANEL:SetChecked(bool)
+    local buttons = self:GetRadioButtons(true)
+    for i, v in ipairs(buttons or {}) do
+        continueif not v:GetChecked()
+        v:SetChecked(false)
+    end
+
+    self.checked = bool
+    Lerp("alpha", bool and 255 or 0, self.radio)
+
+    self:CheckedChanged(bool)
+end
+
+function PANEL:GetTextColor()
+    return self.label:GetTextColor()
+end
+
+function PANEL:SetTextColor(color)
+    self.label:SetTextColor(color)
+end
+
+function PANEL:GetFont()
+    return self.label.GetFont()
+end
+
+function PANEL:SetFont(font)
+    self.label:SetFont(font)
+    self.label:SizeToContents()
+end
+
+function PANEL:GetText()
+    return self.label:GetText()
+end
+
+function PANEL:SetText(text)
+    self.label:SetText(text)
+    self.label:SizeToContents()
+end
+
+function PANEL:DockLabel(dock, margin)
+    self.label:Dock(dock)
+
+    if margin then
+        self.label:DockMargin(unpack(margin))
+    end
+end
+
+function PANEL:GetRadioButtons(ignore)
     local buttons = {}
     local name = self:GetName()
 
     for i, v in ipairs(self:GetParent():GetChildren() or {}) do
         continueif v:GetName() ~= name
+        continueif ignore and v == self
+
         buttons[#buttons + 1] = v
     end
 
     return buttons
 end
 
-vgui.Register("Diamond:RadioButton", PANEL, "DButton")
+function PANEL:CheckedChanged(...)
+
+end
+
+function PANEL:PerformLayout(w, h)
+    if self.radio and IsValid(self.radio) then self.radio:SetWide(h) end
+end
+
+vgui.Register("Diamond:RadioButton", PANEL)
