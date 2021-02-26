@@ -1,3 +1,0 @@
-local PANEL = {}
-
-vgui.Register("Diamond:Navbar", PANEL, "DLabel")
