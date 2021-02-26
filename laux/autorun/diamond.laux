@@ -4,6 +4,7 @@ Diamond.Core ??= {}
 Diamond.Network ??= {}
 Diamond.Theme ??= {}
 Diamond.Animations ??= {}
+Diamond.Configurator ??= {}
 
 do
 	Diamond.Package = {
@@ -67,6 +68,9 @@ do
 		})
 		loader:addDirectory("animations", DIAMOND_SHARED)
 		loader:addDirectory("components", DIAMOND_CLIENT, {
+			recursive = true
+		})
+		loader:addDirectory("configurator", DIAMOND_SHARED, {
 			recursive = true
 		})
 	loader:finish()
