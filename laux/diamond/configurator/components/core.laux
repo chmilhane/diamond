@@ -1,0 +1,7 @@
+local PANEL = {}
+
+function PANEL:SetConfigurator(index)
+    self.configurator = Diamond.Configurator.Cache:get(index)
+end
+
+vgui.Register("Diamond:Configurator:Core", PANEL)

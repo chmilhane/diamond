@@ -70,8 +70,11 @@ do
 		loader:addDirectory("components", DIAMOND_CLIENT, {
 			recursive = true
 		})
-		loader:addDirectory("configurator", DIAMOND_SHARED, {
-			recursive = true
+		loader:addDirectory("configurator", DIAMOND_CLIENT, {
+			recursive = true,
+			realms = {
+				["core"] = DIAMOND_SHARED
+			}
 		})
 	loader:finish()
 end

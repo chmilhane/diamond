@@ -30,7 +30,7 @@ function PANEL:SetContainer(container: Panel, margin = 12: number)
     self.__container = panel
 end
 
-function PANEL:AddPanel(text: string, panel = "Panel", options = {}: table)
+function PANEL:AddPanel(text: string, panel = "Panel")
     local button = vgui.Create("Diamond:Button", self)
     button:SetText(text)
     button:SetLabelPosition(TEXT_ALIGN_CENTER)
@@ -73,7 +73,7 @@ function PANEL:SelectPanel(index: number)
 
     self.animation = true
 
-    timer.Simple(0, function()
+    timer.Simple(0.01, function()
         LerpX(button.x, self.line, 0.2, function() self.animation = nil end)
         LerpW(button:GetWide(), self.line, 0.2, function() self.animation = nil end)
     end)
@@ -94,7 +94,7 @@ function PANEL:PerformLayout(w, h)
 end
 
 function PANEL:Paint(w, h)
-    draw.RoundedBox(0, 0, 0, w, h, theme:lighten("background", -0.2))
+    draw.RoundedBox(0, 0, 0, w, h, theme:lighten("background", -0.1))
 end
 
 vgui.Register("Diamond:Navbar", PANEL)

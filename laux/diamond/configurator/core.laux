@@ -1,3 +1,83 @@
-public class Diamond.Configurator.Core
+Diamond.Configurator.Cache = Diamond.Cache("Configurator")
 
+local theme = Diamond.Theme
+
+public class Diamond.Configurator.Core
+    _get _set title
+
+    constructor(index: string)
+        self.index = index:gsub(" ", "_"):lower()
+        Diamond.Configurator.Cache:store(self.index, self)
+
+        self.categories = {}
+        self.settings = {}
+    end
+
+    addCategory(text: string, number, panel)
+        self.categories[#self.categories + 1] = {
+            text = text,
+            number = number,
+            panel = panel
+        }
+    end
+
+    addSetting(category: string)
+        self.settings[category][#self.settings[category] + 1] = {}
+    end
+
+    save()
+        --> Bob :)
+    end
+
+    openMenu()
+        local w, h = ScrW() * 0.45, ScrH() * 0.55
+
+        local frame = vgui.Create("Diamond:Frame")
+        frame:SetSize(w, h)
+        frame:Center()
+        frame:MakePopup()
+        frame:SetTitle(self:getTitle())
+
+        local navbar = vgui.Create("Diamond:Navbar", frame)
+        navbar:Dock(TOP)
+        navbar:SetTall(50)
+        navbar:SetContainer(frame)
+        for i, v in ipairs(self.categories) do
+            navbar:AddPanel(v.number and `${i}. ${v.text}` or v.text, (parent) =>
+                local panel = vgui.Create(v.panel ?? "Diamond:Configurator:Core")
+                panel:Dock(FILL)
+                if panel.SetConfigurator then panel:SetConfigurator(self.index) end
+            end)
+        end
+        navbar:SelectPanel(1)
+    end
 end
+
+do
+    class Settings extends Diamond.Configurator.Core
+        constructor()
+            super("library")
+
+            self:setTitle("Diamond Configurator")
+
+            self:addCategory("Introduction", true)
+            self:addCategory("General", true)
+            self:addCategory("Permissions", true)
+        end
+    end
+
+    local _settings = Settings()
+end
+
+stopif SERVER
+local function commandHandler(client, command, args)
+    local index = args[next(args)] ?? args[1]
+
+    local configurator = Diamond.Configurator.Cache:get(index)
+    if not configurator then
+        Diamond:log(`Configuration not found! (${index})`)
+    end
+
+    configurator:openMenu()
+end
+concommand.Add("diamond_configurator", commandHandler)
