@@ -16,6 +16,10 @@ public class Diamond.Configurator.Core
         self:setDrawNumbers(false)
     end
 
+    editIntroduction(panel)
+        self.categories[next(self.categories) ?? 1].panel = panel
+    end
+
     addCategory(text: string, number, panel)
         self.categories[#self.categories + 1] = {
             text = text,
