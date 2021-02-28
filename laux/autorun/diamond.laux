@@ -5,6 +5,7 @@ Diamond.Network ??= {}
 Diamond.Theme ??= {}
 Diamond.Animations ??= {}
 Diamond.Configurator ??= {}
+Diamond.DB ??= {}
 
 do
 	Diamond.Package = {
@@ -46,6 +47,9 @@ end
 
 do
 	local loader = Diamond.Core.Loader(Diamond.Package)
+		loader:addDirectory("classes/database", DIAMOND_SERVER, {
+			recursive = true,
+		})
 		loader:addFile("classes/cache", DIAMOND_SHARED)
 		loader:addFile("animations/easing/core", DIAMOND_SHARED)
 		loader:addDirectory("core", DIAMOND_SHARED)
@@ -54,6 +58,9 @@ do
 			filesToIgnore = {
 				["loader"] = true,
 				["emitter"] = true,
+			},
+			foldersToIgnore = {
+				["database"] = true
 			}
 		})
 		loader:addDirectory("libraries", DIAMOND_SHARED, {

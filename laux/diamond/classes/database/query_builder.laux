@@ -1,0 +1,131 @@
+import MySQL, SQLite from Diamond.DB.Drivers
+
+public class Diamond.DB
+    _where = {}
+    _joins = {}
+    _select = {}
+    _get _set method
+
+    constructor(tbl)
+        self.tbl = tbl
+
+        self:setMethod("SELECT")
+    end
+
+    where(key, value, operator, keyword)
+        self._where[#self._where + 1] = {
+            key = key,
+            value = value,
+            operator = operator or "=",
+            keyword = keyword or "AND"
+        }
+        return self
+    end
+
+    whereIf(condition, key, value, operator, keyword)
+        stopif not condition
+        self:where(key, value, operator, keyword)
+        return self
+    end
+
+    whereIn(key, array)
+        self:where(key, array, nil, "IN")
+    end
+
+    orWhere(condition, key, value, operator)
+        self:where(key, value, operator, "OR")
+        return self
+    end
+
+    join(tbl, primary, operator, secondary)
+        self._joins[#self._joins + 1] = {
+            tbl = tbl,
+            primary = primary,
+            secondary = secondary,
+            operator = operator or "="
+        }
+        return self
+    end
+
+    groupBy(column)
+        self.group = column
+        return self
+    end
+
+    select(...)
+        local args = { ... }
+        self._select = args
+    end
+
+    update(tbl)
+
+    end
+
+    limit(limit: number)
+        self._limit = limit
+        return self
+    end
+
+    first()
+        self:limit(1)
+        local res = self:makeRequest()
+        return res and res[1]
+    end
+
+    get()
+        return self:makeRequest()
+    end
+
+    toSql()
+        local method = self:getMethod()
+        local tbl = self.tbl
+        local select = self._select
+        local where = self._where
+        local joins = self._joins
+        local limit = self._limit
+
+        local query = method .." "
+        if method ~= "SELECT" then
+            query ..= tbl
+        else
+            query ..= select[1] and table.concat(select, ",") or "*"
+            query ..= " FROM " ..tbl
+        end
+
+        if joins and #joins > 0 then
+            for k, v in ipairs(joins) do
+                query ..= ` INNER JOIN ${v.tbl} ON ` ..v.primary..v.operator..v.secondary
+            end
+        end
+
+        if where and #where > 0 then
+            query ..= " WHERE "
+            for k, v in ipairs(where) do
+                local b = (k ~= 1 and v.keyword .." " or "")
+                query ..= istable(v.value) and (b ..v.key .." IN (" ..table.concat(v.value, ', ') ..")") or (b ..v.key ..v.operator ..MySQLite.SQLStr(v.value) .." ")
+            end
+        end
+
+        if limit then
+            query ..= ` LIMIT ${limit}`
+        end
+
+        if self.group then
+            query ..= ` GROUP BY ${self.group} `
+        end
+        
+        return query
+    end
+
+    makeRequest()
+        local p = Diamond.Promises.new()
+        local query = self:toSql()
+        print(query)
+        MySQLite.query(query, function(res)
+            p:resolve(res)
+        end, function(err)
+            p:reject(err)
+        end)
+        return p.value
+    end
+end

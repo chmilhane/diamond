@@ -1,0 +1,39 @@
+BATK ||= {}
+
+public class BATK.Users extends Diamond.Models
+    -- table = "batk_users"
+
+    constructor()
+        super()
+    end
+
+    warns()
+        return self:hasMany(BATK.Warns, "user_id", "steamid64")
+    end
+end
+
+public class BATK.Warns extends Diamond.Models
+    -- table = "batk_warns"
+
+    constructor()
+        super()
+    end
+
+
+end
+
+
+-- local req = Diamond.DB('batk_users')
+--     :where('name', 'Brique au bob')
+--     :join('batk_warns', 'steamid64', '=', 'user_id')
+
+-- print("ok", BATK.Users():with("warns"):get())
+-- print(BATK.Users():with("warns"):get())
+-- print("req", 
+--     -- req:toSql(),
+--     -- req:get(),
+--     BATK.Users():with("warns"):first()
+-- )
+
+
+

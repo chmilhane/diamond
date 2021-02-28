@@ -18,6 +18,7 @@ public class Diamond.Core.Loader
 	static defaultOptions = {
 		recursive = false,
 		filesToIgnore = {},
+		foldersToIgnore = {},
 		realms = {}
 	}
 
@@ -117,6 +118,8 @@ public class Diamond.Core.Loader
 
 		for i, v in ipairs(b or {}) do
 			continueif not options.recursive
+			continueif options.foldersToIgnore[v]
+
 			self:addDirectory(path .. "/" .. v, realm, options)
 		end
 	end

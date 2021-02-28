@@ -1,0 +1,132 @@
+--TODO: add hasOne, belongsTo relationships
+
+-- self.relationships[#self.relationships + 1] = {
+--     cls = cls,
+--     fk = fk,
+--     pk = pk,
+--     type = HasMany,
+--     method = self.methodCalled,
+-- }
+class HasMany 
+    constructor(model, key, res)
+        self.model = model
+        self.response = res
+        self.singleItem = res.id and true or res[1] and false
+    end
+
+    getValues()
+        if self.singleItem then
+            return {self.response[self.model.pk]}
+        end
+        local values = {}
+        for k, v in ipairs(self.response) do
+            values[#values + 1] = v[self.model.pk]            
+        end
+        return values 
+    end
+
+    retrieve()
+        stopif self.singleItem == nil
+
+        local vals = self:getValues()
+        local res = self.model.cls():whereIn(self.model.fk, vals):get()
+        local collection = Diamond.Collection(res):regroup(self.model.fk):get()
+
+        local tbl = self.response
+        for k, v in pairs(tbl) do
+            tbl[k][self.model.method] = collection[v[self.model.pk]]
+        end
+        return tbl
+    end
+end
+
+class HasOne
+
+end
+
+class BelongsTo
+
+end
+
+public class Diamond.Models
+    relationships = {}
+
+    constructor(child)
+        self.table = self.table or self:__type():lower():Replace(".", "_")
+        self.connection = Diamond.DB(self.table)
+    end
+
+    where(key, value, operator, keyword)
+        self.connection:where(key, value, operator, keyword)
+        return self
+    end
+
+    whereIf(condition, key, value, operator, keyword)
+        stopif not condition
+        self.connection:whereIf(condition, key, value, operator, keyword)
+        return self
+    end
+
+    whereIn(key: string, array: table)
+        self.connection:whereIn(key, array)
+        return self
+    end
+
+    groupBy(key)
+        self.connection:groupBy(key)
+        return self
+    end
+
+    with(method: string)
+        stopif not self[method]
+        self.methodCalled = method
+        return self[method](self)
+    end
+
+    hasMany(cls, fk, pk)
+        self.relationships[#self.relationships + 1] = {
+            cls = cls,
+            fk = fk,
+            pk = pk,
+            type = HasMany,
+            method = self.methodCalled,
+        }
+        return self
+    end
+
+    limit(num: number)
+        self.connection:limit(num)
+        return self
+    end
+
+    toSql()
+        return self.connection:toSql()
+    end
+
+    first()
+        local res = self.connection:first()
+        local relationships = self.relationships
+        if relationships and #relationships > 0 then
+            for k, v in ipairs(relationships) do
+                local db = v.cls():where(v.fk, res[v.pk]):get()
+                res[v.method] = db
+            end
+        end
+        return res
+    end
+
+    get()
+        local res = self.connection:get()
+        if not res or not istable(res) then
+            return {}
+        end
+
+        local relationships = self.relationships
+        if relationships and #relationships > 0 then
+            for k, v in ipairs(relationships) do
+                res = v.type(v, k, res):retrieve()
+            end
+        end
+        return res
+    end
+end
