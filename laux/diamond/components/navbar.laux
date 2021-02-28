@@ -98,7 +98,7 @@ function PANEL:SelectPanel(index: number, f = false: boolean)
         self.line:SetWide(button:GetWide())
 
         local fract = math.TimeFraction(0, 1, FrameTime() * 10)
-        local goal = button.x + 2
+        local goal = button.x
 
         self.line.x = math.Round(Lerp(fract, self.line.x, goal))
     end
