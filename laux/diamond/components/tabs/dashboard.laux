@@ -8,15 +8,15 @@ function PANEL:Init()
     self.navbar:SetTall(50)
     self.navbar:AddPanel("Option A", "DPanel")
     self.navbar:AddPanel("Option B", (parent) =>
-        local checkbox = vgui.Create("Diamond:CheckBox", parent)
-        checkbox:Dock(TOP)
-        checkbox:DockMargin(0, 5, 0, 0)
+        -- local checkbox = vgui.Create("Diamond:CheckBox", parent)
+        -- checkbox:Dock(TOP)
+        -- checkbox:DockMargin(0, 5, 0, 0)
 
-        for i = 1, 5 do
-            local rb = parent:Add("Diamond:RadioButton")
-            rb:Dock(TOP)
-            rb:DockMargin(0, 5, 0, 0)
-        end
+        -- for i = 1, 5 do
+        --     local rb = parent:Add("Diamond:RadioButton")
+        --     rb:Dock(TOP)
+        --     rb:DockMargin(0, 5, 0, 0)
+        -- end
     end)
     self.navbar:SelectPanel(1)
 end

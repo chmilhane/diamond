@@ -104,7 +104,7 @@ function PANEL:SelectPanel(index: number)
 end
 
 function PANEL:Paint(w, h)
-    draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, theme:lighten("background", -0.1), false, false, true, false)
+    draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, theme:lighten("background", -0.2), false, false, true, false)
 end
 
 vgui.Register("Diamond:Sidebar", PANEL, "DScrollPanel")

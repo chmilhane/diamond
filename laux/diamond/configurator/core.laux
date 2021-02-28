@@ -1,3 +1,147 @@
-public class Diamond.Configurator.Core
+Diamond.Configurator.Cache = Diamond.Cache("Configurator")
 
+local theme = Diamond.Theme
+
+public class Diamond.Configurator.Core
+    _get _set package
+    _get _set drawNumbers
+
+    constructor(index: string)
+        self.index = index:gsub(" ", "_"):lower()
+        Diamond.Configurator.Cache:store(self.index, self)
+
+        self.categories = {}
+        self.settings = {}
+
+        self:setDrawNumbers(false)
+    end
+
+    addCategory(text: string, number, panel)
+        self.categories[#self.categories + 1] = {
+            text = text,
+            number = number,
+            panel = panel
+        }
+    end
+
+    addSetting(category: string)
+        self.settings[category][#self.settings[category] + 1] = {}
+    end
+
+    save()
+        --> Bob :)
+    end
+
+    openMenu()
+        local w, h = ScrW() * 0.45, ScrH() * 0.55
+
+        local package = self:getPackage()
+        local title, color = (package.name or "Addon") .. "'s Configuration", package.color
+
+        local frame = vgui.Create("Diamond:Frame")
+        frame:SetSize(w, h)
+        frame:Center()
+        frame:MakePopup()
+        frame:SetTitle(title)
+        frame:SetHeaderColor(color)
+
+        local navbar = vgui.Create("Diamond:Navbar", frame)
+        navbar:Dock(TOP)
+        navbar:SetTall(50)
+        navbar:DisableNavbar(true)
+        navbar:SetContainer(frame)
+        for i, v in ipairs(self.categories) do
+            navbar:AddPanel(self:getDrawNumbers() and `${i}. ${v.text}` or v.text, (parent) =>
+                local panel = vgui.Create("DScrollPanel" ?? v.panel ?? "Diamond:Configurator:Core", frame)
+                panel:Dock(FILL)
+                if panel.SetConfigurator then panel:SetConfigurator(self.index) end
+            end)
+        end
+        navbar:SetColor(color)
+
+        local panel = vgui.Create("DPanel", frame)
+        panel.Paint = (this, w, h) =>
+            local x, y = this:LocalToScreen()
+
+            Diamond.Shadows.BeginShadow()
+                draw.RoundedBox(theme:get("radius"), x, y, w, h, theme:lighten("background", -0.25))
+            Diamond.Shadows.EndShadow(0.5, 2, 5, 200, 0, 15)
+
+            Diamond:DrawIcon("f7d9", "Solid", 28, h / 2, h / 2, 1, 1, theme:get("text"))
+            draw.SimpleText(self?.categories?[navbar.active]?.text, Diamond:Font(24), 32 + h / 2, h / 2, theme:get("text"), 0, 1)
+        end
+        panel.Think = (this) => this:MoveToFront() end
+
+        function panel:PerformLayout(panelWidth, panelHeight)
+            self:SetSize(w / 1.14, h * 0.125)
+            self.y = (h - panelHeight) - (h * 0.05)
+            self:CenterHorizontal()
+        end
+
+        local buttons = {
+            {
+                text = "Next",
+                style = "default",
+                onClick = function(this)
+                    local x = navbar.active + 1
+                    navbar:SelectPanel(x > #navbar.buttons and 1 or x, true)
+                end
+            },
+            {
+                text = "Previous",
+                style = "outlined",
+                onClick = function(this)
+                    local x = navbar.active - 1
+                    navbar:SelectPanel(x < 1 and #navbar.buttons or x, true)
+                    print(navbar.active)
+                end
+            },
+        }
+
+        for _, x in ipairs(buttons) do
+            local button = vgui.Create("Diamond:Button", panel)
+            button:Dock(RIGHT)
+            button:DockMargin(6, 16, 16, 16)
+            button:SetText(x.text)
+            button:SetStyle(x.style)
+            button.DoClick = x.onClick
+            button:SetWide(100)
+        end
+    end
 end
+
+do
+    class Settings extends Diamond.Configurator.Core
+        constructor()
+            super("library")
+
+            -- self:setPackage(Diamond.Package)
+            self:setPackage({
+                name = "BobAdminToolKit",
+                color = Color(105, 81, 233)
+            })
+
+            self:setDrawNumbers(true)
+
+            self:addCategory("Introduction") --, "Diamond:Configurator:Tabs:Introduction")
+            self:addCategory("General")
+            self:addCategory("Permissions")
+        end
+    end
+
+    local _settings = Settings()
+    -- _settings:get(...)
+end
+
+stopif SERVER
+local function commandHandler(client, command, args)
+    local index = args[next(args)] ?? args[1]
+
+    local configurator = Diamond.Configurator.Cache:get(index)
+    if not configurator then
+        Diamond:log(`Configuration not found! (${index})`)
+    end
+
+    configurator:openMenu()
+end
+concommand.Add("diamond_configurator", commandHandler)

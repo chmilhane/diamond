@@ -1,7 +1,6 @@
 local PANEL = {}
 
 local theme = Diamond.Theme
-import LerpX, LerpW from Diamond.Animations
 
 function PANEL:Init()
     self:SetContainer(self:GetParent())
@@ -13,9 +12,15 @@ function PANEL:Init()
 
     self.line = vgui.Create("DPanel", self)
     self.line.Paint = (this, w, h) =>
-        draw.RoundedBox(0, 0, 0, w, h, theme:alpha("black", 40))
-        draw.RoundedBox(0, 0, h - 3, w, 3, theme:get("preference"))
+        draw.RoundedBox(0, 0, 0, w, h, theme:alpha("black", 35))
+        draw.RoundedBox(0, 0, h - 3, w, 3, self.color ?? theme:get("preference"))
     end
+
+    self:DisableNavbar(false)
+end
+
+function PANEL:DisableNavbar(bool)
+    self.disabled = tobool(bool)
 end
 
 function PANEL:GetContainer()
@@ -30,7 +35,7 @@ function PANEL:SetContainer(container: Panel, margin = 12: number)
     self.__container = panel
 end
 
-function PANEL:AddPanel(text: string, panel = "Panel", options = {}: table)
+function PANEL:AddPanel(text: string, panel = "Panel")
     local button = vgui.Create("Diamond:Button", self)
     button:SetText(text)
     button:SetLabelPosition(TEXT_ALIGN_CENTER)
@@ -38,8 +43,23 @@ function PANEL:AddPanel(text: string, panel = "Panel", options = {}: table)
     button:Dock(LEFT)
     button:SetRadius(0)
     button:SetFont(Diamond:Font(20))
+    button.OnCursorEntered = (this) =>
+        stopif not self.disabled
+        this:SetCursor("no")
+    end
+    button.OnCursorExited = (this) =>
+        stopif not self.disabled
+        this:SetCursor("hand")
+    end
 
     local index = #self.buttons + 1
+    -- button.PaintOver = function(this, w, h)
+    --     stopif index % 2 == 1
+
+    --     surface.SetDrawColor(theme:alpha("background", 128))
+    --     surface.DrawRect(0, 0, 3, h)
+    --     surface.DrawRect(w - 3, 0, 3, h)
+    -- end
 
     button.DoClick = (this) =>
         self:SelectPanel(index)
@@ -47,10 +67,13 @@ function PANEL:AddPanel(text: string, panel = "Panel", options = {}: table)
 
     self.panels[#self.panels + 1] = panel
     self.buttons[index] = button
+
+    self:SelectPanel(1, true)
 end
 
-function PANEL:SelectPanel(index: number)
-    stopif index == self.active or self.animation
+function PANEL:SelectPanel(index: number, f = false: boolean)
+    stopif self.disabled and not f
+    stopif index == self.active
 
     local container = self:GetContainer()
     container:AlphaTo(0, 0.15, 0, function()
@@ -71,14 +94,24 @@ function PANEL:SelectPanel(index: number)
     activeButton:SetChecked(false)
     button:SetChecked(true)
 
-    self.animation = true
+    self.line.Think = function(this)
+        self.line:SetWide(button:GetWide())
 
-    timer.Simple(0, function()
-        LerpX(button.x, self.line, 0.2, function() self.animation = nil end)
-        LerpW(button:GetWide(), self.line, 0.2, function() self.animation = nil end)
-    end)
+        local fract = math.TimeFraction(0, 1, FrameTime() * 10)
+        local goal = button.x + 2
+
+        self.line.x = math.Round(Lerp(fract, self.line.x, goal))
+    end
 
     self.active = index
+end
+
+function PANEL:GetColor()
+	return self.color
+end
+
+function PANEL:SetColor(color)
+	self.color = color
 end
 
 function PANEL:PerformLayout(w, h)
@@ -94,7 +127,7 @@ function PANEL:PerformLayout(w, h)
 end
 
 function PANEL:Paint(w, h)
-    draw.RoundedBox(0, 0, 0, w, h, theme:lighten("background", -0.2))
+    draw.RoundedBox(0, 0, 0, w, h, theme:lighten("background", -0.1))
 end
 
 vgui.Register("Diamond:Navbar", PANEL)
