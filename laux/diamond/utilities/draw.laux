@@ -87,12 +87,35 @@ function Diamond:DrawRoundedOutlinedRect(radius, x, y, w, h, thickness, color)
     end, true)
 end
 
+function Diamond:DrawTexturedRect(x, y, w, h, mat, color)
+    surface.SetMaterial(mat)
+    surface.SetDrawColor(color or color_white)
+    surface.DrawTexturedRect(x, y, w, h)
+end
+
 function Diamond:DrawRoundedTexturedRect(radius, x, y, w, h, mat, color)
     self:MaskStencil(function()
         self:DrawRoundedRect(radius, x, y, w, h, color)
     end, function()
-        surface.SetDrawColor(color)
-        surface.SetMaterial(mat)
-        surface.DrawTexturedRect(x, y, w, h)
+        Diamond:DrawTexturedRect(x, y, w, h, mat, color)
     end)
+end
+
+function Diamond:FormatIcon(icon)
+    return utf8.char(tonumber(string.format("0x%s", icon)))
+end
+
+local __cache = {}
+function Diamond:GetIconFont(style, size)
+    local path = `Diamond:${style}:${size}`
+    if __cache[path] then return __cache[path] end
+
+    local font = Diamond:Font(size, { font = string.format("Font Awesome 5 Pro %s", style) })
+    __cache[path] = font
+
+    return font
+end
+
+function Diamond:DrawIcon(icon, style, size, x, y, xAlign, yAlign, color)
+    draw.SimpleText(self:FormatIcon(icon), self:GetIconFont(style, size), x, y, color ?? color_white, xAlign, yAlign)
 end

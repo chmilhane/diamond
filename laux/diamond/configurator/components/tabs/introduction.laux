@@ -1,0 +1,3 @@
+local PANEL = {}
+
+vgui.Register("Diamond:Configurator:Tabs:Introduction", PANEL)
