@@ -28,7 +28,7 @@ function PANEL:Init()
     self:SetTextColor(theme:get("text"))
     self:SetText("Radio Button")
     self:SetFont(Diamond:Font(18))
-    self:DockLabel(RIGHT) -- (LEFT, { 10, 0, 0, 0 })
+    self:DockLabel(LEFT, { 10, 0, 0, 0 })
 
     self:SetThickness(2)
     self:SetChecked(true)

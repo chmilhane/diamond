@@ -73,7 +73,7 @@ end
 
 function Diamond:DrawRoundedOutlinedRect(radius, x, y, w, h, thickness, color)
     if radius == 0 then
-        for i=0, thickness / 2 - 1 do
+        for i = 0, thickness / 2 - 1 do
             surface.SetDrawColor(color)
             surface.DrawOutlinedRect(i, i, w - i * 2, h - i * 2)
         end

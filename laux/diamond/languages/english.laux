@@ -1,1 +1,7 @@
-local x
+return {
+    ["core.components.theme.modes"] = "Modes",
+    ["core.components.theme.colors"] = "Colors",
+
+    ["core.components.sidebar.dashboard"] = "Dashboard",
+    ["core.components.sidebar.preferences"] = "Preferences",
+}

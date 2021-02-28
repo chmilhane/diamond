@@ -1,7 +1,7 @@
 local PANEL = {}
 
 import Lerp, LerpColor from Diamond.Animations
-local theme = Diamond.Theme
+local theme, lang = Diamond.Theme, Diamond.Language
 
 AccessorFunc(PANEL, "__draggable", "Draggable", FORCE_BOOL)
 AccessorFunc(PANEL, "__screenLock", "ScreenLock", FORCE_BOOL)
@@ -19,7 +19,8 @@ function PANEL:Init()
     self.header = self:Add("Panel")
     self.header:Dock(TOP)
     self.header.Paint = (this, w, h) =>
-		draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, theme:lighten("background", 0.25), true, true, false, false)
+		local color = this.color ?? theme:lighten("background", 0.25)
+		draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, color, true, true, false, false)
     end
 	self.header.OnMousePressed = function(this)
 		stopif not self:GetDraggable()
@@ -103,6 +104,18 @@ function PANEL:Init()
 	end)
 end
 
+function PANEL:ShowCloseButton(bool)
+	self.close:SetVisible(bool)
+end
+
+function PANEL:GetHeaderColor()
+	return self.header.color
+end
+
+function PANEL:SetHeaderColor(color)
+	self.header.color = color
+end
+
 function PANEL:Paint(w, h)
 	local x, y = self:LocalToScreen()
 
@@ -115,7 +128,7 @@ function PANEL:GetTitle()
   	return self.title:GetText()
 end
 
-function PANEL:SetTitle(title: string)
+function PANEL:SetTitle(title = "Window": string)
 	self.title:SetText(title)
 	self.title:SizeToContents()
 end
@@ -148,8 +161,8 @@ local function openMenu(client)
 	sidebar:AddCard("Diamond:Cards:Player", 70, () ->
 		self:SetRadius(4)
 	end)
-	sidebar:AddPanel("Dashboard", utf8.char(0xf3fd), "Diamond:Tabs:Dashboard", { --[[ BackgroundColor = theme:get("purple"), ]] Radius = 4 })
-	sidebar:AddPanel("Preferences", utf8.char(0xf085), "Diamond:Tabs:Preferences", { --[[ BackgroundColor = theme:get("blue"), ]] Radius = 4 })
+	sidebar:AddPanel(lang:get("core.components.sidebar.dashboard"), utf8.char(0xf3fd), "Diamond:Tabs:Dashboard", { --[[ BackgroundColor = theme:get("purple"), ]] Radius = 4 })
+	sidebar:AddPanel(lang:get("core.components.sidebar.preferences"), utf8.char(0xf085), "Diamond:Tabs:Preferences", { --[[ BackgroundColor = theme:get("blue"), ]] Radius = 4 })
 	sidebar:AddPanel("Test", utf8.char(0xf15c), function(parent)
 		local button = vgui.Create("Diamond:Button", parent)
 		button:Dock(TOP)
@@ -160,6 +173,5 @@ local function openMenu(client)
 		button:SetRadius(8)
 		button:SetTranslationY(-4)
 	end, { BackgroundColor = theme:get("orange"), Radius = 4 })
-	sidebar:SelectPanel(1)
 end
 concommand.Add("diamond", openMenu)

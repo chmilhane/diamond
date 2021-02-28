@@ -66,15 +66,17 @@ do
 				["miscellaneous"] = DIAMOND_CLIENT
 			}
 		})
-		loader:addDirectory("animations", DIAMOND_SHARED)
+		loader:addDirectory("animations", DIAMOND_SHARED, {
+			recursive = true
+		})
 		loader:addDirectory("components", DIAMOND_CLIENT, {
 			recursive = true
 		})
-		loader:addDirectory("configurator", DIAMOND_CLIENT, {
-			recursive = true,
-			realms = {
-				["core"] = DIAMOND_SHARED
-			}
+		loader:addDirectory("configurator", DIAMOND_SHARED, {
+			recursive = false
+		})
+		loader:addDirectory("configurator/components", DIAMOND_CLIENT, {
+			recursive = true
 		})
 	loader:finish()
 end

@@ -3,7 +3,7 @@ Diamond.Configurator.Cache = Diamond.Cache("Configurator")
 local theme = Diamond.Theme
 
 public class Diamond.Configurator.Core
-    _get _set title
+    _get _set package
 
     constructor(index: string)
         self.index = index:gsub(" ", "_"):lower()
@@ -32,24 +32,45 @@ public class Diamond.Configurator.Core
     openMenu()
         local w, h = ScrW() * 0.45, ScrH() * 0.55
 
+        local package = self:getPackage()
+        local title, color = (package.name or "Addon") .. "'s Configuration", package.color
+
         local frame = vgui.Create("Diamond:Frame")
         frame:SetSize(w, h)
         frame:Center()
         frame:MakePopup()
-        frame:SetTitle(self:getTitle())
+        frame:SetTitle(title)
+        frame:SetHeaderColor(color)
 
         local navbar = vgui.Create("Diamond:Navbar", frame)
         navbar:Dock(TOP)
         navbar:SetTall(50)
+        navbar:DisableNavbar(true)
         navbar:SetContainer(frame)
         for i, v in ipairs(self.categories) do
             navbar:AddPanel(v.number and `${i}. ${v.text}` or v.text, (parent) =>
-                local panel = vgui.Create(v.panel ?? "Diamond:Configurator:Core")
+                local panel = vgui.Create("DScrollPanel" ?? v.panel ?? "Diamond:Configurator:Core", frame)
                 panel:Dock(FILL)
                 if panel.SetConfigurator then panel:SetConfigurator(self.index) end
             end)
         end
-        navbar:SelectPanel(1)
+        navbar:SetColor(color)
+
+        local panel = vgui.Create("DPanel", frame)
+        panel.Paint = (this, w, h) =>
+            local x, y = this:LocalToScreen()
+
+            Diamond.Shadows.BeginShadow()
+                draw.RoundedBox(theme:get("radius"), x, y, w, h, theme:lighten("background", -0.25))
+            Diamond.Shadows.EndShadow(0.5, 2, 5, 200, 0, 15)
+        end
+        panel.PerformLayout = (this, _w, _h) =>
+            this:SetSize(w / 1.14, h * 0.125)
+            this.y = (h - _h) - (h * 0.05)
+
+            this:CenterHorizontal()
+        end
+        panel.Think = (this) => this:MoveToFront() end
     end
 end
 
@@ -58,7 +79,11 @@ do
         constructor()
             super("library")
 
-            self:setTitle("Diamond Configurator")
+            self:setPackage(Diamond.Package)
+            -- self:setPackage({
+            --     name = "BobAdminToolKit",
+            --     color = Color(105, 81, 233)
+            -- })
 
             self:addCategory("Introduction", true)
             self:addCategory("General", true)

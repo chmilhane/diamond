@@ -1,31 +1,42 @@
-public class Diamond.Language
+public class Diamond.Core.Language
     _get _set defaultLanguage
     _get _set activeLanguage
 
-    constructor()
+    constructor(defaultLanguage = "english": string)
        self.cache = {}
 
-       self:setDefaultLanguage("english")
+       self:setDefaultLanguage(defaultLanguage)
+       self:setActiveLanguage(self:getDefaultLanguage())
     end
 
     add(index: string, content: table)
-        self.cache[index] = content
+        self.cache[string.StripExtension(index)] = content
     end
 
-    addFromFile(index: string, path: string)
+    addFile(path: string, index)
         if (SERVER) then
             AddCSLuaFile(path)
         end
 
-        self.cache[index] = include(path)
+        self:add(index ?? string.GetFileFromFilename(path), include(path) ?? {})
+    end
+
+    addDirectory(path: string)
+        local files = file.Find(path .. "/*", "LUA")
+        for i, v in ipairs(files) do
+            self:addFile(path .. "/" .. v)
+        end
     end
 
     get(index, ...)
         if not index then return self.cache end
         
         local lang = self.cache[self:getActiveLanguage()] ?? self.cache[self:getDefaultLanguage()]
-        local value = lang[index] ?? index
+        local value = lang and lang[index] or index
 
         return value:format(...)
     end
 end
+
+Diamond.Language = Diamond.Core.Language()
+Diamond.Language:addDirectory("diamond/languages")

@@ -1,7 +1,15 @@
 local PANEL = {}
 
+function PANEL:Init()
+    self.color = ColorRand()
+end
+
 function PANEL:SetConfigurator(index)
     self.configurator = Diamond.Configurator.Cache:get(index)
+end
+
+function PANEL:Paint(w, h)
+    draw.RoundedBox(0, 0, 0, w, h, self.color)
 end
 
 vgui.Register("Diamond:Configurator:Core", PANEL)

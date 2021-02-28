@@ -6,6 +6,7 @@ SETTINGS.DefaultAnimationEase = Diamond.Animations.Ease:get("outQuart")
 
 SETTINGS.Materials = {
     ["closeButton"] = Material("diamond/closeButton.png", "smooth"),
+    ["rocket"] = Material("diamond/rocket.png", "smooth"),
     ["gradient"] = Material("vgui/gradient-r", "smooth"),
 }
 

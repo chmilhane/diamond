@@ -68,7 +68,6 @@ local styles = {
                 or self:IsHovered() and theme:lighten(self:GetBackgroundColor(), 0.2)
                 or self:GetBackgroundColor()
         )
-
         draw.RoundedBox(self:GetRadius(), 0, 0, w, h, self.background)
     end,
     outlined = function(self, w, h)
