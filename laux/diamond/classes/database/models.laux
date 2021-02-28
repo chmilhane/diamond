@@ -1,12 +1,3 @@
---TODO: add hasOne, belongsTo relationships
-
--- self.relationships[#self.relationships + 1] = {
---     cls = cls,
---     fk = fk,
---     pk = pk,
---     type = HasMany,
---     method = self.methodCalled,
--- }
 class HasMany 
     constructor(model, key, res)
         self.model = model
