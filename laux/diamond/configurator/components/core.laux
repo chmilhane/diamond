@@ -140,6 +140,10 @@ function PANEL:CreatePanel(configurator)
                 if x > #self.navbar.buttons then
                     local popup = confirmationPopup(self, (res) =>
                         self.moveToBack = res
+
+                        if res then
+                            configurator:save()
+                        end
                     end)
 
                     return

@@ -11,7 +11,7 @@ public class Diamond.Configurator.Core
         self.categories = {}
         self.settings = {}
 
-        self:setDrawNumbers(false)
+        self:setDrawNumbers(true)
         self:addCategory("Introduction", "f7d9", "Diamond:Configurator:Tabs:Introduction")
     end
 
@@ -41,6 +41,7 @@ public class Diamond.Configurator.Core
 
     save()
         --> Bob :)
+        print("saved")
     end
 
     openMenu()
@@ -57,13 +58,14 @@ do
         constructor()
             super("library")
 
-            self:setPackage(Diamond.Package)
-            -- self:setPackage({
-            --     name = "BobAdminToolKit",
-            --     color = Color(105, 81, 233)
-            -- })
+            -- self:setPackage(Diamond.Package)
+            self:setPackage({
+                name = "BobAdminToolKit",
+                description = "The best administration solution for your Garry's Mod server!",
+                color = Color(105, 81, 233)
+            })
 
-            self:setDrawNumbers(true)
+            self:setDrawNumbers(false)
 
             self:addCategory("General", "f14e")
             self:addCategory("Permissions", "f007", "Diamond:Configurator:Tabs:Permissions")

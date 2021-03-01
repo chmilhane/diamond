@@ -1,3 +1,5 @@
+local theme = Diamond.Theme
+
 function Diamond:MaskStencil(mask, rendering, invert = false: boolean)
     render.ClearStencil()
     render.SetStencilEnable(true)
