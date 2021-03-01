@@ -26,8 +26,8 @@ local function confirmationPopup(parent, callback)
     text:Dock(FILL)
 
     function text:Paint(w, h)
-        local titleFont = Diamond:Font(32)
-        local subtitleFont = Diamond:Font(26)
+        local titleFont = Diamond:Font(ScreenScale(10))
+        local subtitleFont = Diamond:Font(ScreenScale(9))
 
         draw.SimpleText("Lorem ipsum dolor sit amet, consectetur...", titleFont, w / 2, 0, theme:get("text"), 1, TEXT_ALIGN_TOP)
         draw.SimpleText("Lorem ipsum dolor sit amet, consectetur...", subtitleFont, w / 2, draw.GetFontHeight(titleFont) + 2, theme:lighten("text", -0.3), 1, TEXT_ALIGN_TOP)
@@ -103,7 +103,7 @@ function PANEL:CreateNavbar(configurator)
             end
         end)
     end
-    self.navbar:SetColor(configurator.color)
+    self.navbar:SetColor(configurator:getPackage().color)
 end
 
 function PANEL:CreatePanel(configurator)
@@ -159,13 +159,13 @@ function PANEL:CreatePanel(configurator)
         },
     }
 
-    for _, x in ipairs(buttons) do
+    for x, y in ipairs(buttons) do
         local button = vgui.Create("Diamond:Button", self.panel)
         button:Dock(RIGHT)
-        button:DockMargin(6, 16, 16, 16)
-        button:SetText(x.text)
-        button:SetStyle(x.style)
-        button.DoClick = x.onClick
+        button:DockMargin(6, 16, x % 2 == 1 and 16 or 6, 16)
+        button:SetText(y.text)
+        button:SetStyle(y.style)
+        button.DoClick = y.onClick
         button:SetWide(100)
     end
 end

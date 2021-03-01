@@ -57,11 +57,11 @@ do
         constructor()
             super("library")
 
-            -- self:setPackage(Diamond.Package)
-            self:setPackage({
-                name = "BobAdminToolKit",
-                color = Color(105, 81, 233)
-            })
+            self:setPackage(Diamond.Package)
+            -- self:setPackage({
+            --     name = "BobAdminToolKit",
+            --     color = Color(105, 81, 233)
+            -- })
 
             self:setDrawNumbers(true)
 
