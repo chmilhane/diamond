@@ -1,0 +1,48 @@
+local PANEL = FindMetaTable("Panel")
+
+function PANEL:FadeIn(duration, callback, easeFunction)
+    duration ??= Diamond.Core.Settings.DefaultAnimationLength
+    easeFunction ??= Diamond.Core.Settings.DefaultEaseFunction
+
+    local anim = self:NewAnimation(duration)
+    self:SetAlpha(0)
+
+    function anim:Think(panel, fraction)
+		if easeFunction and isfunction(easeFunction) then
+			fraction = easeFunction(fraction)        
+		end
+
+        local alpha = Lerp(fraction, panel:GetAlpha(), 255)
+        panel:SetAlpha(alpha)
+    end
+
+    function anim:OnEnd(panel)
+		if callback and isfunction(callback) then
+			callback(self, panel)
+		end
+    end
+end
+
+function PANEL:FadeOut(duration, callback, easeFunction)
+    duration ??= Diamond.Core.Settings.DefaultAnimationLength
+    easeFunction ??= Diamond.Core.Settings.DefaultEaseFunction
+
+    local anim = self:NewAnimation(duration)
+
+    function anim:Think(panel, fraction)
+		if easeFunction and isfunction(easeFunction) then
+			fraction = easeFunction(fraction)        
+		end
+
+        local alpha = Lerp(fraction, panel:GetAlpha(), 0)
+        panel:SetAlpha(alpha)
+    end
+
+    function anim:OnEnd(panel)
+		if callback and isfunction(callback) then
+			callback(self, panel)
+        else
+            panel:Remove()
+		end
+    end
+end
