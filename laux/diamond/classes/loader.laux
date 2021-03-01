@@ -15,13 +15,6 @@ public class Diamond.Core.Loader
 		}
 	}
 
-	static defaultOptions = {
-		recursive = false,
-		filesToIgnore = {},
-		foldersToIgnore = {},
-		realms = {}
-	}
-
 	static logTheme = {
 		text = Color(225, 225, 225),
 
@@ -92,12 +85,15 @@ public class Diamond.Core.Loader
 	end
 
 	addDirectory(path: string, realm: number, options = {}: table)
-		options = table.Merge(Diamond.Core.Loader.defaultOptions, options)
+		options.recursive = options.recursive or false
+		options.filesToIgnore = options.filesToIgnore or {}
+		options.foldersToIgnore = options.foldersToIgnore or {}
+		options.realms = options.realms or {}
 
 		local { root } = self.package
 		-- path = root .. "/" .. path
 
-		if (string.EndsWith(path, "/")) then
+		if string.EndsWith(path, "/") then
 			local len = #path
 			path = string.sub(path, len - 1, len)
 		end

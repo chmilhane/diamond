@@ -1,0 +1,7 @@
+Diamond.Components:register("Diamond:Accordion", (base, ...) =>
+    base:accessorFunc("expanded", FORCE_BOOL)
+
+    function base:Initialize()
+        self:setExpanded(true)
+    end
+end)

@@ -1,24 +1,22 @@
-local PANEL = {}
-
 local theme = Diamond.Theme
 
-function PANEL:Init()
-    self.navbar = vgui.Create("Diamond:Navbar", self)
-    self.navbar:Dock(TOP)
-    self.navbar:SetTall(50)
-    self.navbar:AddPanel("Option A", "DPanel")
-    self.navbar:AddPanel("Option B", (parent) =>
-        -- local checkbox = vgui.Create("Diamond:CheckBox", parent)
-        -- checkbox:Dock(TOP)
-        -- checkbox:DockMargin(0, 5, 0, 0)
+Diamond.Components:register("Diamond:Tabs:Dashboard", (base, ...) =>
+    function base:Initialize()
+        self.navbar = Diamond.Components:create("Diamond:Navbar", self)
+        self.navbar:Dock(TOP)
+        self.navbar:SetTall(50)
+        self.navbar:AddPanel("Option A", "DPanel")
+        self.navbar:AddPanel("Option B", (parent) =>
+            -- local checkbox = vgui.Create("Diamond:CheckBox", parent)
+            -- checkbox:Dock(TOP)
+            -- checkbox:DockMargin(0, 5, 0, 0)
 
-        -- for i = 1, 5 do
-        --     local rb = parent:Add("Diamond:RadioButton")
-        --     rb:Dock(TOP)
-        --     rb:DockMargin(0, 5, 0, 0)
-        -- end
-    end)
-    self.navbar:SelectPanel(1)
-end
-
-vgui.Register("Diamond:Tabs:Dashboard", PANEL)
+            -- for i = 1, 5 do
+            --     local rb = parent:Add("Diamond:RadioButton")
+            --     rb:Dock(TOP)
+            --     rb:DockMargin(0, 5, 0, 0)
+            -- end
+        end)
+        self.navbar:SelectPanel(1)
+    end
+end)

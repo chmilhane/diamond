@@ -1,133 +1,136 @@
-local PANEL = {}
-
 local theme = Diamond.Theme
 
-function PANEL:Init()
-    self:SetContainer(self:GetParent())
+Diamond.Components:register("Diamond:Navbar", (base, ...) =>
+    function base:Initialize()
+        self:SetContainer(self:GetParent())
 
-    self.active = -1
+        self.active = -1
 
-    self.buttons = {}
-    self.panels = {}
+        self.buttons = {}
+        self.panels = {}
 
-    self.line = vgui.Create("DPanel", self)
-    self.line.Paint = (this, w, h) =>
-        draw.RoundedBox(0, 0, 0, w, h, theme:alpha("black", 35))
-        draw.RoundedBox(0, 0, h - 3, w, 3, self.color ?? theme:get("preference"))
-    end
-
-    self:DisableNavbar(false)
-end
-
-function PANEL:DisableNavbar(bool)
-    self.disabled = tobool(bool)
-end
-
-function PANEL:GetContainer()
-    return self.__container
-end
-
-function PANEL:SetContainer(container: Panel, margin = 12: number)
-    local panel = vgui.Create("Panel", container)
-    panel:Dock(FILL)
-    panel:DockMargin(margin, margin, margin, margin)
-
-    self.__container = panel
-end
-
-function PANEL:AddPanel(text: string, panel = "Panel")
-    local button = vgui.Create("Diamond:Button", self)
-    button:SetText(text)
-    button:SetLabelPosition(TEXT_ALIGN_CENTER)
-    button:SetStyle("transparent")
-    button:Dock(LEFT)
-    button:SetRadius(0)
-    button:SetFont(Diamond:Font(20))
-    button.OnCursorEntered = (this) =>
-        stopif not self.disabled
-        this:SetCursor("no")
-    end
-    button.OnCursorExited = (this) =>
-        stopif not self.disabled
-        this:SetCursor("hand")
-    end
-
-    local index = #self.buttons + 1
-    -- button.PaintOver = function(this, w, h)
-    --     stopif index % 2 == 1
-
-    --     surface.SetDrawColor(theme:alpha("background", 128))
-    --     surface.DrawRect(0, 0, 3, h)
-    --     surface.DrawRect(w - 3, 0, 3, h)
-    -- end
-
-    button.DoClick = (this) =>
-        self:SelectPanel(index)
-    end
-
-    self.panels[#self.panels + 1] = panel
-    self.buttons[index] = button
-
-    self:SelectPanel(1, true)
-end
-
-function PANEL:SelectPanel(index: number, f = false: boolean)
-    stopif self.disabled and not f
-    stopif index == self.active
-
-    local container = self:GetContainer()
-    container:AlphaTo(0, 0.15, 0, function()
-        container:Clear()
-
-        local panel = self.panels[index] ?? self.panels[1]
-        if isfunction(panel) then
-            panel(container)
-        else
-            local panel = vgui.Create(panel, container)
-            panel:Dock(FILL)
+        self.line = vgui.Create("DPanel", self)
+        self.line.Paint = (this, w, h) =>
+            draw.RoundedBox(0, 0, 0, w, h, theme:alpha("black", 35))
+            draw.RoundedBox(0, 0, h - 3, w, 3, self.color ?? theme:get("preference"))
         end
-        container:AlphaTo(255, 0.15)
-    end)
 
-    local button = self.buttons[index]
-    local activeButton = self.buttons[self.active] ?? self.buttons[1] 
-    activeButton:SetChecked(false)
-    button:SetChecked(true)
-
-    self.line.Think = function(this)
-        self.line:SetWide(button:GetWide())
-
-        local fract = math.TimeFraction(0, 1, FrameTime() * 10)
-        local goal = button.x
-
-        self.line.x = math.Round(Lerp(fract, self.line.x, goal))
+        self:DisableNavbar(false)
     end
 
-    self.active = index
-end
-
-function PANEL:GetColor()
-	return self.color
-end
-
-function PANEL:SetColor(color)
-	self.color = color
-end
-
-function PANEL:PerformLayout(w, h)
-    if self.line and IsValid(self.line) then
-        self.line:SetTall(h)
-        -- self.line.y = h - self.line:GetTall()
-        -- self.line:MoveToFront()
+    function base:DisableNavbar(bool)
+        self.disabled = tobool(bool)
     end
 
-    for i, v in ipairs(self.buttons) do
-        v:SetSize((w / #self.buttons) + 1, h)
+    function base:GetContainer()
+        return self.__container
     end
-end
 
-function PANEL:Paint(w, h)
-    draw.RoundedBox(0, 0, 0, w, h, theme:lighten("background", -0.1))
-end
+    function base:SetContainer(container: Panel, margin = 12: number)
+        local panel = vgui.Create("Panel", container)
+        panel:Dock(FILL)
+        panel:DockMargin(margin, margin, margin, margin)
 
-vgui.Register("Diamond:Navbar", PANEL)
+        self.__container = panel
+    end
+
+    function base:AddPanel(text: string, panel = "Panel")
+        local button = Diamond.Components:create("Diamond:Button", self)
+        button:SetText(text)
+        button:setLabelPosition(TEXT_ALIGN_CENTER)
+        button:setStyle("transparent")
+        button:setRadius(0)
+        button:Dock(LEFT)
+        button:SetFont(Diamond:Font(20))
+        button.OnCursorEntered = (this) =>
+            stopif not self.disabled
+            this:SetCursor("no")
+        end
+        button.OnCursorExited = (this) =>
+            stopif not self.disabled
+            this:SetCursor("hand")
+        end
+
+        local index = #self.buttons + 1
+        -- button.PaintOver = function(this, w, h)
+        --     stopif index % 2 == 1
+
+        --     surface.SetDrawColor(theme:alpha("background", 128))
+        --     surface.DrawRect(0, 0, 3, h)
+        --     surface.DrawRect(w - 3, 0, 3, h)
+        -- end
+
+        button.DoClick = (this) =>
+            self:SelectPanel(index)
+        end
+
+        self.panels[#self.panels + 1] = panel
+        self.buttons[index] = button
+
+        self:SelectPanel(1, true)
+    end
+
+    function base:SelectPanel(index: number, f = false: boolean)
+        stopif self.disabled and not f
+        stopif index == self.active
+
+        local container = self:GetContainer()
+        container:AlphaTo(0, 0.15, 0, function()
+            container:Clear()
+
+            local panel = self.panels[index] ?? self.panels[1]
+            if Diamond.Components:get(panel) then
+                local _panel = panel
+                panel = (parent) =>
+                    Diamond.Components:create(_panel, parent):Dock(FILL)
+                end
+            end
+            if isfunction(panel) then
+                panel(container)
+            else
+                vgui.Create(panel, container):Dock(FILL)
+            end
+            container:AlphaTo(255, 0.15)
+        end)
+
+        local button = self.buttons[index]
+        local activeButton = self.buttons[self.active] ?? self.buttons[1] 
+        activeButton:setChecked(false)
+        button:setChecked(true)
+
+        self.line.Think = function(this)
+            self.line:SetWide(button:GetWide())
+
+            local fract = math.TimeFraction(0, 1, FrameTime() * 10)
+            local goal = button.x
+
+            self.line.x = math.Round(Lerp(fract, self.line.x, goal))
+        end
+
+        self.active = index
+    end
+
+    function base:GetColor()
+        return self.color
+    end
+
+    function base:SetColor(color)
+        self.color = color
+    end
+
+    function base:PerformLayout(w, h)
+        if self.line and IsValid(self.line) then
+            self.line:SetTall(h)
+            -- self.line.y = h - self.line:GetTall()
+            -- self.line:MoveToFront()
+        end
+
+        for i, v in ipairs(self.buttons) do
+            v:SetSize((w / #self.buttons) + 1, h)
+        end
+    end
+
+    function base:Paint(w, h)
+        draw.RoundedBox(0, 0, 0, w, h, theme:lighten("background", -0.1))
+    end
+end)

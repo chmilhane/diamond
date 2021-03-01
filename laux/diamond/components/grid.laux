@@ -1,71 +1,69 @@
 -- Source --> https://github.com/Threebow/better-derma-grid/blob/master/threegrid.lua
-local PANEL = {}
+Diamond.Components:register("Diamond:Grid", (base, ...) =>
+	base:accessorFunc("horizontalMargin", FORCE_NUMBER)
+	base:accessorFunc("verticalMargin", FORCE_NUMBER)
+	base:accessorFunc("columns", FORCE_NUMBER)
 
-AccessorFunc(PANEL, "horizontalMargin", "HorizontalMargin", FORCE_NUMBER)
-AccessorFunc(PANEL, "verticalMargin", "VerticalMargin", FORCE_NUMBER)
-AccessorFunc(PANEL, "columns", "Columns", FORCE_NUMBER)
+	function base:Initialize()
+		self:setHorizontalMargin(0)
+		self:setVerticalMargin(0)
 
-function PANEL:Init()
-	self:SetHorizontalMargin(0)
-	self:SetVerticalMargin(0)
-
-	self.Rows = {}
-	self.Cells = {}
-end
-
-function PANEL:AddCell(pnl)
-	local cols = self:GetColumns()
-	local idx = math.floor(#self.Cells/cols)+1
-	self.Rows[idx] = self.Rows[idx] || self:CreateRow()
-
-	local margin = self:GetHorizontalMargin()
-	
-	pnl:SetParent(self.Rows[idx])
-	pnl:Dock(LEFT)
-	pnl:DockMargin(0, 0, #self.Rows[idx].Items+1 < cols && self:GetHorizontalMargin() || 0, 0)
-	pnl:SetWide((self:GetWide()-margin*(cols-1))/cols)
-
-	table.insert(self.Rows[idx].Items, pnl)
-	table.insert(self.Cells, pnl)
-	self:CalculateRowHeight(self.Rows[idx])
-end
-
-function PANEL:CreateRow()
-	local row = self:Add("DPanel")
-	row:Dock(TOP)
-	row:DockMargin(0, 0, 0, self:GetVerticalMargin())
-	row.Paint = nil
-	row.Items = {}
-	return row
-end
-
-function PANEL:CalculateRowHeight(row)
-	local height = 0
-
-	for k, v in pairs(row.Items) do
-		height = math.max(height, v:GetTall())
+		self.Rows = {}
+		self.Cells = {}
 	end
 
-	row:SetTall(height)
-end
+	function base:AddCell(pnl)
+		local cols = self:getColumns()
+		local idx = math.floor(#self.Cells/cols)+1
+		self.Rows[idx] = self.Rows[idx] || self:CreateRow()
 
-function PANEL:Skip()
-	local cell = vgui.Create("DPanel")
-	cell.Paint = nil
-	self:AddCell(cell)
-end
+		local margin = self:getHorizontalMargin()
+		
+		pnl:SetParent(self.Rows[idx])
+		pnl:Dock(LEFT)
+		pnl:DockMargin(0, 0, #self.Rows[idx].Items+1 < cols && self:getHorizontalMargin() || 0, 0)
+		pnl:SetWide((self:GetWide()-margin*(cols-1))/cols)
 
-function PANEL:Clear()
-	for _, row in pairs(self.Rows) do
-		for _, cell in pairs(row.Items) do
-			cell:Remove()
+		table.insert(self.Rows[idx].Items, pnl)
+		table.insert(self.Cells, pnl)
+		self:CalculateRowHeight(self.Rows[idx])
+	end
+
+	function base:CreateRow()
+		local row = self:Add("DPanel")
+		row:Dock(TOP)
+		row:DockMargin(0, 0, 0, self:getVerticalMargin())
+		row.Paint = nil
+		row.Items = {}
+		return row
+	end
+
+	function base:CalculateRowHeight(row)
+		local height = 0
+
+		for k, v in pairs(row.Items) do
+			height = math.max(height, v:GetTall())
 		end
-		row:Remove()
+
+		row:SetTall(height)
 	end
 
-	self.Cells, self.Rows = {}, {}
-end
+	function base:Skip()
+		local cell = vgui.Create("DPanel")
+		cell.Paint = nil
+		self:AddCell(cell)
+	end
 
-PANEL.OnRemove = PANEL.Clear
+	function base:Clear()
+		for _, row in pairs(self.Rows) do
+			for _, cell in pairs(row.Items) do
+				cell:Remove()
+			end
+			row:Remove()
+		end
 
-vgui.Register("Diamond:Grid", PANEL, "DScrollPanel")
+		self.Cells, self.Rows = {}, {}
+	end
+
+	base.OnRemove = base.Clear
+end, "DScrollPanel")

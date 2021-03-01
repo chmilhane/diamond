@@ -1,0 +1,54 @@
+local __cache = {}
+
+local PANEL = FindMetaTable("Panel") or {}
+function PANEL:accessorFunc(variable: string, force)
+    local name = variable:gsub("^%l", string.upper)
+
+    self["get" .. name] = () ->
+        return self[variable]
+    end
+
+    self["set" .. name] = (value) ->
+        self[variable] = force == FORCE_STRING and tostring(value) or
+                         force == FORCE_NUMBER and tonumber(value) or
+                         force == FORCE_BOOL   and tobool(value)   or
+                         value
+    end
+end
+
+public class Diamond.Components
+    static get(this, name)
+        return (isstring(name) and __cache[name]) and true or false
+    end
+
+    static create(this, name: string, parent, ...)
+        local v = __cache[name]
+        stopif not v or not istable(v)
+
+        local base = nil
+        local hasPanel = this:get(v.base)
+
+        if hasPanel then
+            base = this:create(v.base, parent)
+        else
+            base = vgui.Create(v.base, parent)
+        end
+
+        if v.panel and isfunction(v.panel) then
+            v.panel(base, ...)
+        end
+
+        if base.Initialize and isfunction(base.Initialize) and not hasPanel then
+            base:Initialize()
+        end
+
+        return base
+    end
+
+    static register(this, name: string, panel, base = "Panel": string)
+        __cache[name] = {
+            panel = panel,
+            base = base
+        }
+    end
+end

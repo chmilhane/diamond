@@ -1,62 +1,59 @@
-local PANEL = {}
+local theme, lang = Diamond.Theme, Diamond.Language
 
-local theme = Diamond.Theme
-local lang = Diamond.Language
-
-function PANEL:Init()
+Diamond.Components:register("Diamond:Tabs:Preferences", (base, ...) =>
     local margin = 12
 
-    self.scroll = vgui.Create("DScrollPanel", self)
-    self.scroll:Dock(FILL)
-    self.scroll:DockMargin(12, 12, 12, 12)
+    function base:Initialize()
+        self.scroll = vgui.Create("DScrollPanel", self)
+        self.scroll:Dock(FILL)
+        self.scroll:DockMargin(margin, margin, margin, margin)
 
-    local prefMode, prefColor = theme:getCurrentTheme(), theme:getCurrentColor()
-    for i, v of theme:list() do
-        local label = vgui.Create("DLabel", self.scroll)
-        label:Dock(TOP)
-        label:DockMargin(0, 0, 0, margin / 2)
-        label:SetText(lang:get("core.components.theme." .. i))
-        label:SetFont(Diamond:Font(24))
-        label:SetTextColor(theme:get("text"))
-        label:SizeToContentsY()
-
-        Diamond:on("themeChanged", (oldTheme, newTheme) =>
-            stopif not label or not IsValid(label)
+        local prefMode, prefColor = theme:getCurrentTheme(), theme:getCurrentColor()
+        for i, v of theme:list() do
+            local label = vgui.Create("DLabel", self.scroll)
+            label:Dock(TOP)
+            label:DockMargin(0, 0, 0, margin / 2)
+            label:SetText(lang:get("core.components.theme." .. i))
+            label:SetFont(Diamond:Font(24))
             label:SetTextColor(theme:get("text"))
-        end)
+            label:SizeToContentsY()
 
-        local icon = vgui.Create("DIconLayout", self.scroll)
-        icon:Dock(TOP)
-        icon:DockMargin(0, 0, 0, margin)
-        icon:SetSpaceX(margin)
-        icon:SetSpaceY(margin)
+            Diamond:on("themeChanged", (oldTheme, newTheme) =>
+                stopif not label or not IsValid(label)
+                label:SetTextColor(theme:get("text"))
+            end)
 
-        for x, color of v do
-            continueif x == "black" or x == "white"
+            local icon = vgui.Create("DIconLayout", self.scroll)
+            icon:Dock(TOP)
+            icon:DockMargin(0, 0, 0, margin)
+            icon:SetSpaceX(margin)
+            icon:SetSpaceY(margin)
 
-            local btn = vgui.Create("DPanel", icon)
-            btn:SetSize(42, 42)
-            btn:SetCursor("hand")
+            for x, color of v do
+                continueif x == "black" or x == "white"
 
-            function btn:Paint(w, h)
-                local m = 4
-                local r = h / 2 or 4
-                draw.RoundedBox(r, 0, 0, w, h, theme:lighten("background", 5))
-                draw.RoundedBox(r, m / 2, m / 2, w - m, h - m, istable(color) and color.background or color)
+                local btn = vgui.Create("DPanel", icon)
+                btn:SetSize(42, 42)
+                btn:SetCursor("hand")
 
-                if prefMode == x or prefColor == x then
-                    draw.SimpleText(utf8.char(0xf00c), Diamond:Font(22, { font = "Font Awesome 5 Free Solid" }), w / 2 , h / 2, theme:get((prefMode == "light" and x == "light") and "black" or "white"), 1, 1)
+                function btn:Paint(w, h)
+                    local m = 4
+                    local r = h / 2 or 4
+                    draw.RoundedBox(r, 0, 0, w, h, theme:lighten("background", 5))
+                    draw.RoundedBox(r, m / 2, m / 2, w - m, h - m, istable(color) and color.background or color)
+
+                    if prefMode == x or prefColor == x then
+                        draw.SimpleText(utf8.char(0xf00c), Diamond:Font(22, { font = "Font Awesome 5 Free Solid" }), w / 2 , h / 2, theme:get((prefMode == "light" and x == "light") and "black" or "white"), 1, 1)
+                    end
                 end
-            end
 
-            function btn:OnMousePressed()
-                theme:setCurrentTheme(x)
-                theme:setCurrentColor(x)
+                function btn:OnMousePressed()
+                    theme:setCurrentTheme(x)
+                    theme:setCurrentColor(x)
 
-                prefMode, prefColor = theme:getCurrentTheme(), theme:getCurrentColor()
+                    prefMode, prefColor = theme:getCurrentTheme(), theme:getCurrentColor()
+                end
             end
         end
     end
-end
-
-vgui.Register("Diamond:Tabs:Preferences", PANEL)
+end)

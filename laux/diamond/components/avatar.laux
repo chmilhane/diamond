@@ -1,29 +1,27 @@
-local PANEL = {}
+Diamond.Components:register("Diamond:Avatar", (base, ...) =>
+    base:accessorFunc("radius", FORCE_NUMBER)
 
-AccessorFunc(PANEL, "__radius", "Radius", FORCE_NUMBER)
+    function base:Initialize()
+        self:setRadius(4)
 
-function PANEL:Init()
-    self:SetRadius(4)
+        self.avatar = vgui.Create("AvatarImage", self)
+        self.avatar:SetPaintedManually(true)
+        self.avatar:Dock(FILL)
+    end
 
-    self.avatar = vgui.Create("AvatarImage", self)
-    self.avatar:SetPaintedManually(true)
-    self.avatar:Dock(FILL)
-end
+    function base:SetPlayer(...)
+        self.avatar:SetPlayer(...)
+    end
 
-function PANEL:SetPlayer(...)
-    self.avatar:SetPlayer(...)
-end
+    function base:SetSteamID(...)
+        self.avatar:SetSteamID(...)
+    end
 
-function PANEL:SetSteamID(...)
-    self.avatar:SetSteamID(...)
-end
-
-function PANEL:Paint(w, h)
-    Diamond:MaskStencil(() =>
-        Diamond:DrawRoundedRect(self:GetRadius(), 0, 0, w, h, color_white)
-    end, () =>
-        self.avatar:PaintManual()
-    end)
-end
-
-vgui.Register("Diamond:Avatar", PANEL)
+    function base:Paint(w, h)
+        Diamond:MaskStencil(() =>
+            Diamond:DrawRoundedRect(self:getRadius(), 0, 0, w, h, color_white)
+        end, () =>
+            self.avatar:PaintManual()
+        end)
+    end
+end)

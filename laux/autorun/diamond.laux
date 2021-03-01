@@ -52,7 +52,11 @@ do
 		})
 		loader:addFile("classes/cache", DIAMOND_SHARED)
 		loader:addFile("animations/easing/core", DIAMOND_SHARED)
-		loader:addDirectory("core", DIAMOND_SHARED)
+		loader:addDirectory("core", DIAMOND_SHARED, {
+			realms = {
+				["components"] = DIAMOND_CLIENT
+			}
+		})
 		loader:addDirectory("classes", DIAMOND_SHARED, {
 			recursive = true,
 			filesToIgnore = {

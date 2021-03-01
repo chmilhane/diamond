@@ -1,6 +1,6 @@
 local PANEL = FindMetaTable("Panel")
 
-function PANEL:FadeIn(duration, callback, easeFunction)
+function PANEL:fadeIn(duration, callback, easeFunction)
     duration ??= Diamond.Core.Settings.DefaultAnimationLength
     easeFunction ??= Diamond.Core.Settings.DefaultEaseFunction
 
@@ -23,7 +23,7 @@ function PANEL:FadeIn(duration, callback, easeFunction)
     end
 end
 
-function PANEL:FadeOut(duration, callback, easeFunction)
+function PANEL:fadeOut(duration, callback, easeFunction)
     duration ??= Diamond.Core.Settings.DefaultAnimationLength
     easeFunction ??= Diamond.Core.Settings.DefaultEaseFunction
 

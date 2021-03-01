@@ -45,7 +45,7 @@ public class Diamond.Configurator.Core
     end
 
     openMenu()
-        local frame = vgui.Create("Diamond:Configurator:Core")
+        local frame = Diamond.Components:create("Diamond:Configurator:Core")
         frame:SetSize(ScrW() * 0.45, ScrH() * 0.55)
         frame:Center()
         frame:MakePopup()
