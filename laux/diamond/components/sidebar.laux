@@ -76,6 +76,8 @@ function PANEL:AddPanel(text: string, icon, panel = "Panel", options = {}: table
 
     self.panels[#self.panels + 1] = panel
     self.buttons[index] = button
+
+    self:SelectPanel(1)
 end
 
 function PANEL:SelectPanel(index: number)
