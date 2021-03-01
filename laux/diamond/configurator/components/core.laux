@@ -16,7 +16,6 @@ local function confirmationPopup(parent, callback)
     container.Paint = nil
 
     local buttons = vgui.Create("DPanel", container)
-    buttons:Dock(BOTTOM)
     buttons:SetTall(42)
     buttons.Paint = nil
 
@@ -33,8 +32,11 @@ local function confirmationPopup(parent, callback)
 
     function container:PerformLayout(_w, _h)
         local w, h = parent:GetSize()
-        self:SetSize(w * 0.65, h * 0.215)
-        self:CenterHorizontal()
+        self:SetSize(w, h * 0.215)
+        buttons:SetWide(w * 0.45)
+        buttons.y = _h - buttons:GetTall()
+        buttons:CenterHorizontal()
+
         self:CenterVertical(0.45)
     end
 
