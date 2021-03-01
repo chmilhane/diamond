@@ -10,6 +10,7 @@ Diamond.DB ??= {}
 do
 	Diamond.Package = {
 		name = "Diamond",
+		description = "Powerful Garry's Mod Framework !",
 		color = Color(233, 83, 120),
 		author = "Brique au Bob & DARZ",
 		contact = {
