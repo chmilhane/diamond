@@ -2,10 +2,11 @@ local SETTINGS = {}
 
 SETTINGS.DefaultAnimationLength = 0.5
 
-SETTINGS.DefaultAnimationEase = Diamond.Animations.Ease:get("outQuart")
+SETTINGS.DefaultAnimationEase = Diamond.Animations.Ease:get("linear")
 
 SETTINGS.Materials = {
     ["closeButton"] = Material("diamond/closeButton.png", "smooth"),
+    ["arrow"] = Material("diamond/arrow.png", "smooth"),
     ["gradient"] = Material("vgui/gradient-r", "smooth"),
 }
 

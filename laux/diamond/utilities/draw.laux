@@ -89,17 +89,22 @@ function Diamond:DrawRoundedOutlinedRect(radius, x, y, w, h, thickness, color)
     end, true)
 end
 
-function Diamond:DrawTexturedRect(x, y, w, h, mat, color)
+function Diamond:DrawTexturedRect(x, y, w, h, mat, color, rotation)
     surface.SetMaterial(mat)
     surface.SetDrawColor(color or color_white)
-    surface.DrawTexturedRect(x, y, w, h)
+
+    if not rotation then
+        surface.DrawTexturedRect(x, y, w, h)
+    else
+        surface.DrawTexturedRectRotated(x + (w / 2), y + (h / 2), w, h, rotation)
+    end
 end
 
-function Diamond:DrawRoundedTexturedRect(radius, x, y, w, h, mat, color)
+function Diamond:DrawRoundedTexturedRect(radius, x, y, w, h, mat, color, rotation)
     self:MaskStencil(function()
         self:DrawRoundedRect(radius, x, y, w, h, color)
     end, function()
-        Diamond:DrawTexturedRect(x, y, w, h, mat, color)
+        Diamond:DrawTexturedRect(x, y, w, h, mat, color, rotation)
     end)
 end
 

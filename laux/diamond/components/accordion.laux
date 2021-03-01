@@ -1,7 +1,63 @@
-Diamond.Components:register("Diamond:Accordion", (base, ...) =>
-    base:accessorFunc("expanded", FORCE_BOOL)
+--[[
+    --> TODO
 
-    function base:Initialize()
-        self:setExpanded(true)
+    local theme = Diamond.Theme
+    import Lerp, LerpColor from Diamond.Animations
+
+    Diamond.Components:register("Diamond:Accordion", (base, ...) =>
+        base:accessorFunc("expanded", FORCE_BOOL)
+        base:accessorFunc("text", FORCE_STRING)
+        base:accessorFunc("font", FORCE_STRING)
+
+        function base:Initialize()
+            self:setExpanded(true)
+            self:setText("Undefined")
+            self:setFont(Diamond:Font(18))
+
+            self.rotation = 180
+            self:OnCursorEntered()
+
+            self.background = theme:lighten("background", -0.2)
+
+            self:SetText("")
+        end
+
+        function base:DoClick()
+            self:setExpanded(not self:getExpanded())
+        end
+
+        function base:OnCursorEntered()
+            Lerp("rotation", 0, self)
+            LerpColor("background", theme:lighten("background", -0.2), self)
+        end
+
+        function base:OnCursorExited()
+            stopif self:getExpanded()
+
+            Lerp("rotation", 180, self)
+            LerpColor("background", theme:lighten("background", -0.15), self)
+        end
+
+        function base:Paint(w, h)
+            local rounded = not self:getExpanded()
+            draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, self.background, true, true, rounded, rounded)
+            draw.SimpleText(self:getText(), self:getFont(), h / 2, h / 2, theme:get("text"), 0, 1)
+
+            local size = h / 4
+            Diamond:DrawTexturedRect((w - size) - h / 2, h / 2 - size / 2, size, size, Diamond.Core.Settings.Materials["arrow"], theme:get("text"), self.rotation)
+        end
+    end, "DButton")
+
+    local function openMenu()
+        local frame = Diamond.Components:create("Diamond:Frame")
+        frame:SetSize(900, 600)
+        frame:MakePopup()
+        frame:Center()
+
+        local accordion = Diamond.Components:create("Diamond:Accordion", frame)
+        accordion:Dock(TOP)
+        accordion:DockMargin(16, 16, 16, 16)
+        accordion:SetTall(60)
     end
-end)
+    openMenu()
+]]
