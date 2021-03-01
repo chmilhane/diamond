@@ -9,7 +9,7 @@ public class Diamond.AnimationBase
 		self:setPanel(panel)
 
 		anim.Think = (anim, panel, fraction) =>
-		if (easeFunction and isfunction(easeFunction)) then
+		if easeFunction and isfunction(easeFunction) then
 			fraction = easeFunction(fraction)        
 		end
 
@@ -17,7 +17,7 @@ public class Diamond.AnimationBase
 		end
 
 		anim.OnEnd = (...) =>
-		if (callback and isfunction(callback)) then
+		if callback and isfunction(callback) then
 			callback(...)
 		end
 

@@ -1,3 +1,7 @@
 local PANEL = {}
 
+function PANEL:Paint(w, h)
+
+end
+
 vgui.Register("Diamond:Configurator:Tabs:Introduction", PANEL)

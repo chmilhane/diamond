@@ -1,15 +1,186 @@
 local PANEL = {}
 
-function PANEL:Init()
-    self.color = ColorRand()
+local theme = Diamond.Theme
+
+local function confirmationPopup(parent, callback)
+    local popup = vgui.Create("DPanel", parent)
+    popup:Dock(FILL)
+    popup:FadeIn()
+
+    function popup:Paint(w, h)
+        draw.RoundedBox(theme:get("radius"), 0, 0, w, h, theme:alpha("background", 160))
+    end
+
+    parent.moveToBack = true
+    popup:MoveToFront()
+
+    local container = vgui.Create("DPanel", popup)
+    container.Paint = nil
+
+    local buttons = vgui.Create("DPanel", container)
+    buttons:Dock(BOTTOM)
+    buttons:SetTall(42)
+    buttons.Paint = nil
+
+    local text = vgui.Create("DPanel", container)
+    text:Dock(FILL)
+
+    function text:Paint(w, h)
+        local titleFont = Diamond:Font(32)
+        local subtitleFont = Diamond:Font(26)
+
+        draw.SimpleText("Lorem ipsum dolor sit amet, consectetur...", titleFont, w / 2, 0, theme:get("text"), 1, TEXT_ALIGN_TOP)
+        draw.SimpleText("Lorem ipsum dolor sit amet, consectetur...", subtitleFont, w / 2, draw.GetFontHeight(titleFont) + 2, theme:lighten("text", -0.3), 1, TEXT_ALIGN_TOP)
+    end
+
+    function container:PerformLayout(_w, _h)
+        local w, h = parent:GetSize()
+        self:SetSize(w * 0.6, h * 0.215)
+        self:Center()
+    end
+
+    local content = {
+        {
+            text = "No",
+            style = "default",
+            backgroundColor = theme:get("red"),
+            onClick = () =>
+                callback(false)
+            end
+        },
+        {
+            text = "Yes",
+            style = "default",
+            backgroundColor = theme:get("green"),
+            onClick = () =>
+                callback(true)
+            end
+        },
+    }
+
+    for i, v in ipairs(content) do
+        local button = vgui.Create("Diamond:Button", buttons)
+        button:SetFont(Diamond:Font(22))
+        button:SetTranslationY(-4)
+        button:SetRadius(4)
+        button:SetText(v.text)
+        button:SetStyle(v.style)
+        button:SetBackgroundColor(v.backgroundColor)
+        button.DoClick = (this) =>
+            popup:FadeOut(_, () =>
+                v.onClick(this)
+                popup:Remove()
+            end)
+        end
+    end
+
+    function buttons:PerformLayout(w, h)
+        local t = self:GetChildren()
+        local m = 12
+
+        for i, v in ipairs(t) do
+            v:SetSize((w / #t) - (m / 2), h)
+            v.x = (i % 2 == 0 and m or 0) + v:GetWide() * (i - 1)
+        end
+    end
+
+    return popup
+end
+
+function PANEL:CreateNavbar(configurator)
+    self.navbar = vgui.Create("Diamond:Navbar", self)
+    self.navbar:Dock(TOP)
+    self.navbar:SetTall(50)
+    -- self.navbar:DisableNavbar(true)
+    self.navbar:SetContainer(self)
+    for i, v in ipairs(configurator.categories) do
+        self.navbar:AddPanel(configurator:getDrawNumbers() and `${i}. ${v.text}` or v.text, (parent) =>
+            local panel = vgui.Create(v.panel ?? "DScrollPanel", parent)
+            panel:Dock(FILL)
+
+            if panel.SetConfigurator then
+                panel:SetConfigurator(configurator.index)
+            end
+        end)
+    end
+    self.navbar:SetColor(configurator.color)
+end
+
+function PANEL:CreatePanel(configurator)
+    self.panel = vgui.Create("DPanel", self)
+    self.panel.Paint = (this, w, h) =>
+        local x, y = this:LocalToScreen()
+
+        Diamond.Shadows.BeginShadow()
+            draw.RoundedBox(theme:get("radius"), x, y, w, h, theme:lighten("background", -0.25))
+        Diamond.Shadows.EndShadow(0.5, 2, 5, 200, 0, 15)
+
+        local data = configurator?.categories?[self.navbar.active]
+        Diamond:DrawIcon(data.icon ?? "f0f4", "Solid", 28, h / 2, h / 2, 1, 1, theme:get("text"))
+        draw.SimpleText(data.text, Diamond:Font(24), 32 + h / 2, h / 2, theme:get("text"), 0, 1)
+
+        if not self.moveToBack then
+            this:MoveToFront()
+        end
+    end
+    self.panel.PerformLayout = (this, panelWidth, panelHeight) =>
+        local w, h = self:GetSize()
+        this:SetSize(w / 1.14, 70)
+        this.y = (h - panelHeight) - 32
+        this:CenterHorizontal()
+    end
+
+    local buttons = {
+        {
+            text = "Next",
+            style = "default",
+            onClick = function(this)
+                local x = self.navbar.active + 1
+
+                if x > #self.navbar.buttons then
+                    local popup = confirmationPopup(self, (res) =>
+                        self.moveToBack = res
+                    end)
+
+                    return
+                end
+
+                self.navbar:SelectPanel(x > #self.navbar.buttons and 1 or x, true)
+            end
+        },
+        {
+            text = "Previous",
+            style = "outlined",
+            onClick = function(this)
+                local x = self.navbar.active - 1
+
+                self.navbar:SelectPanel(x < 1 and #self.navbar.buttons or x, true)
+            end
+        },
+    }
+
+    for _, x in ipairs(buttons) do
+        local button = vgui.Create("Diamond:Button", self.panel)
+        button:Dock(RIGHT)
+        button:DockMargin(6, 16, 16, 16)
+        button:SetText(x.text)
+        button:SetStyle(x.style)
+        button.DoClick = x.onClick
+        button:SetWide(100)
+    end
 end
 
 function PANEL:SetConfigurator(index)
     self.configurator = Diamond.Configurator.Cache:get(index)
+
+    local package = self.configurator:getPackage()
+    local title, color = (package.name or "Addon") .. "'s Configuration", package.color
+
+    self:SetTitle(title)
+    self:SetHeaderColor(color)
+
+    self:CreateNavbar(self.configurator)
+    self:CreatePanel(self.configurator)
 end
 
-function PANEL:Paint(w, h)
-    draw.RoundedBox(0, 0, 0, w, h, self.color)
-end
-
-vgui.Register("Diamond:Configurator:Core", PANEL)
+vgui.Register("Diamond:Configurator:Core", PANEL, "Diamond:Frame")
