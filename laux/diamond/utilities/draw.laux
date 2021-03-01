@@ -165,3 +165,11 @@ function Diamond:DrawRainbowText(font: string, x = 0: number, y = 0: number, xAl
         currentX += surface.GetTextSize(_text)
     end
 end
+
+function Diamond:DrawDualText(title = {}: table, subtitle = {}: table, w: number, h: number, x = 0: number, y = 0: number, xAlign = 0: number, yAlign = 1: number)
+    y = h / 2 - draw.GetFontHeight(subtitle.font) / 2
+    draw.SimpleText(title.text, title.font, x, y, title.color ?? theme:get("text"), xAlign, yAlign)
+
+    y = h / 2 + draw.GetFontHeight(subtitle.font) / 2
+    draw.SimpleText(subtitle.text, subtitle.font, x, y, title.color ?? theme:lighten("text", -0.2), xAlign, yAlign)
+end
