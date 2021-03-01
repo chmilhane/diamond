@@ -119,3 +119,49 @@ end
 function Diamond:DrawIcon(icon, style, size, x, y, xAlign, yAlign, color)
     draw.SimpleText(self:FormatIcon(icon), self:GetIconFont(style, size), x, y, color ?? color_white, xAlign, yAlign)
 end
+
+function Diamond:DrawRainbowText(font: string, x = 0: number, y = 0: number, xAlign = 0, yAlign = 1: number, ...)
+    surface.SetFont(font)
+
+    local currentX = x
+    local currentColor = theme:get("text")
+
+    local  content = { ... }
+    local text = ""
+
+    for i, v in ipairs(content or {}) do
+        continueif IsColor(color)
+        text ..= tostring(v)
+    end
+
+    local w, h = surface.GetTextSize(text)
+
+    if xAlign == TEXT_ALIGN_CENTER then
+        currentX -= w / 2
+    elseif xAlign == TEXT_ALIGN_RIGHT then
+        currentX -= w
+    end
+
+    if yAlign == TEXT_ALIGN_CENTER then
+        y -= h / 2
+    elseif yAlign == TEXT_ALIGN_BOTTOM then
+        y -= h
+    end
+
+    for i, v in ipairs(content or {}) do
+        if IsColor(v) then
+            currentColor = v
+            continue
+        else
+            currentColor = theme:get("text")
+        end
+
+        local _text = tostring(v)
+
+        surface.SetTextColor(currentColor)
+        surface.SetTextPos(currentX, y)
+        surface.DrawText(_text)
+
+        currentX += surface.GetTextSize(_text)
+    end
+end
