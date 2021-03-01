@@ -36,6 +36,7 @@ local function confirmationPopup(parent, callback)
         buttons:SetWide(w * 0.45)
         buttons.y = _h - buttons:GetTall()
         buttons:CenterHorizontal()
+        buttons:MoveToFront()
 
         self:CenterVertical(0.45)
     end
