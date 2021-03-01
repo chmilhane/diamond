@@ -123,49 +123,41 @@ function Diamond:DrawIcon(icon, style, size, x, y, xAlign, yAlign, color)
 end
 
 function Diamond:DrawRainbowText(font: string, x = 0: number, y = 0: number, xAlign = 0, yAlign = 1: number, ...)
-    surface.SetFont(font)
+    -- TODO
+    local _markup = "<font=" .. font .. ">"
 
-    local currentX = x
-    local currentColor = theme:get("text")
-
-    local  content = { ... }
-    local text = ""
-
-    for i, v in ipairs(content or {}) do
-        continueif IsColor(color)
-        text ..= tostring(v)
+    for i, v in ipairs({...}) do
+        _markup ..= IsColor(v) and "<color" or tostring(v)
     end
 
-    local w, h = surface.GetTextSize(text)
+    _markup ..= "</font>"
 
-    if xAlign == TEXT_ALIGN_CENTER then
-        currentX -= w / 2
-    elseif xAlign == TEXT_ALIGN_RIGHT then
-        currentX -= w
-    end
+    -- surface.SetFont(font)
 
-    if yAlign == TEXT_ALIGN_CENTER then
-        y -= h / 2
-    elseif yAlign == TEXT_ALIGN_BOTTOM then
-        y -= h
-    end
+    -- local currentX = x
+    -- local currentColor = theme:get("text")
 
-    for i, v in ipairs(content or {}) do
-        if IsColor(v) then
-            currentColor = v
-            continue
-        else
-            currentColor = theme:get("text")
-        end
+    -- local  content = { ... }
+    -- local text = ""
 
-        local _text = tostring(v)
+    -- for i, v in ipairs(content or {}) do
+    --     continueif IsColor(color)
+    --     text ..= tostring(v)
+    -- end
 
-        surface.SetTextColor(currentColor)
-        surface.SetTextPos(currentX, y)
-        surface.DrawText(_text)
+    -- local w, h = surface.GetTextSize(text)
 
-        currentX += surface.GetTextSize(_text)
-    end
+    -- if xAlign == TEXT_ALIGN_CENTER then
+    --     currentX -= w / 2
+    -- elseif xAlign == TEXT_ALIGN_RIGHT then
+    --     currentX -= w
+    -- end
+
+    -- if yAlign == TEXT_ALIGN_CENTER then
+    --     y -= h / 2
+    -- elseif yAlign == TEXT_ALIGN_BOTTOM then
+    --     y -= h
+    -- end
 end
 
 function Diamond:DrawDualText(title = {}: table, subtitle = {}: table, w: number, h: number, x = 0: number, y = 0: number, xAlign = 0: number, yAlign = 1: number)
