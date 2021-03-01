@@ -117,11 +117,11 @@ function PANEL:SetHeaderColor(color)
 end
 
 function PANEL:Paint(w, h)
-	local x, y = self:LocalToScreen()
+	-- local x, y = self:LocalToScreen()
 
-	Diamond.Shadows.BeginShadow()
-		draw.RoundedBox(theme:get("radius"), x, y, w, h, theme:get("background"))
-	Diamond.Shadows.EndShadow(1, 2, 2, 255, 0, 0)
+	-- Diamond.Shadows.BeginShadow()
+		draw.RoundedBox(theme:get("radius"), 0, 0, w, h, theme:get("background"))
+	-- Diamond.Shadows.EndShadow(1, 2, 2, 255, 0, 0)
 end
 
 function PANEL:GetTitle()
