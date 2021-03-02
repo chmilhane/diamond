@@ -1,22 +1,20 @@
-local PANEL = {}
-
 local theme = Diamond.Theme
 
-function PANEL:Paint(w, h)
-    stopif not self.configurator
-    local package = self.configurator:getPackage()
+Diamond.Components:register("Diamond:Configurator:Tabs:Introduction", (base, ...) =>
+    function base:Paint(w, h)
+        stopif not self.configurator
+        local package = self.configurator:getPackage()
 
-    Diamond:DrawDualText({
-        text = package.name,
-        font = Diamond:Font(ScreenScale(8))
-    }, {
-        text = package.description,
-        font = Diamond:Font(ScreenScale(7.5))
-    }, w, h * 0.3, w / 2, h / 2, 1, 1)
-end
+        Diamond:DrawDualText({
+            text = package.name,
+            font = Diamond:Font(ScreenScale(8))
+        }, {
+            text = package.description,
+            font = Diamond:Font(ScreenScale(7.5))
+        }, w, h * 0.3, w / 2, h / 2, 1, 1)
+    end
 
-function PANEL:SetConfigurator(index)
-    self.configurator = Diamond.Configurator.Cache:get(index)
-end
-
-vgui.Register("Diamond:Configurator:Tabs:Introduction", PANEL)
+    function base:SetConfigurator(index)
+        self.configurator = Diamond.Configurator.Cache:get(index)
+    end
+end)
