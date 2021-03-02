@@ -98,7 +98,14 @@ Diamond.Components:register("Diamond:Configurator:Core", (base, ...) =>
         self.navbar:SetContainer(self)
         for i, v in ipairs(configurator.categories) do
             self.navbar:AddPanel(configurator:getDrawNumbers() and `${i}. ${v.text}` or v.text, (parent) =>
-                local panel = vgui.Create(v.panel ?? "DScrollPanel", parent)
+                local panel
+
+                if Diamond.Components:get(v.panel) then
+                    panel = Diamond.Components:create(v.panel, parent)
+                else
+                    panel = vgui.Create(v.panel ?? "DScrollPanel", parent)
+                end
+
                 panel:Dock(FILL)
 
                 if panel.SetConfigurator then
