@@ -1,0 +1,116 @@
+public class Diamond.Downloader
+    _get directory
+
+    constructor(directory)
+        self.cache = {}
+
+        if directory then
+            self:setDirectory(directory)
+        end
+    end
+
+    checkDirectory(directory: string)
+		if string.EndsWith(directory, "/") then
+			local len = #directory
+			directory = string.sub(directory, len - 1, len)
+		end
+
+        return directory
+    end
+
+    setDirectory(directory: string)
+        self.directory = self:checkDirectory(directory)
+    end
+
+    downloadOne(params: table)
+        local p = Diamond.Promises.new()
+
+        params.directory = params.directory and self:checkDirectory(string.Replace(params.directory, "%BASE%", self:getDirectory())) or self:getDirectory()
+        params.extension = params.extension or "txt"
+        params.url = params.url or params.index and "https://i.imgur.com/" .. params.index .. "." .. params.extension
+        params.filename = params.filename or util.CRC(params.url)
+
+        local path = params.directory .. "/" .. params.filename .. "." .. params.extension
+        if self.cache[path] then return p:reject(path) end
+
+        self.cache[path] = true
+
+        http.Fetch(params.url, (body) =>
+            file.CreateDir(params.directory)
+            file.Write(path, body)
+
+            return p:resolve(path)
+        end, (err) => p:reject(err) end)
+
+        return p
+    end
+
+    download(content: table)
+        local p = Diamond.Promises.new()
+        local i = 1
+
+        local function stack(index)
+            local params = content[index]
+            stopif not params
+
+            self:downloadOne(params):next((res) =>
+                p:resolve({
+                    index = index,
+                    params = params,
+                    path = res
+                })
+
+                i++
+                stack(i)
+            end, (err) => p:reject(err) end)
+        end
+
+        stack(i)
+
+        return p
+    end
+end
+
+--[[
+    - .txt
+    - .dat
+    - .json
+    - .xml
+    - .csv
+    - .jpg
+    - .jpeg
+    - .png
+    - .vtf
+    - .vmt
+    - .mp3
+    - .wav
+    - .ogg
+]]
+
+--[[
+    local downloader = Diamond.Downloader("diamond/files")
+    downloader:download({
+        {
+            index = "I6no46e",
+            extension = "png"
+        },
+
+        {
+            directory = "%BASE%/json",
+            url = "https://api.datamuse.com/words?sl=baguette",
+            extension = "json"
+        },
+
+        {
+            url = "https://www.dropbox.com/s/wcphnfttyn1g37e/hackerman.mp3?dl=1",
+            extension = "mp3"
+        },
+
+        {
+            url = "https://media.discordapp.net/attachments/721524785468932106/797735107338174464/5469a67.png",
+            extension = "png"
+        }
+    }):next((res) =>
+        PrintTable(res)
+    end, (err) => print(err) end)
+]]
