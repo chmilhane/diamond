@@ -9,8 +9,8 @@ Diamond.DB ??= {}
 
 do
 	Diamond.Package = {
-		name = "Diamond",
-		description = "Powerful Garry's Mod Framework !",
+		name = "Diamond Library",
+		description = "A powerful Garry's Mod library !",
 		color = Color(233, 83, 120),
 		author = "Brique au Bob & DARZ",
 		contact = {
