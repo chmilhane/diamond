@@ -26,20 +26,22 @@ public class Diamond.Downloader
         local p = Diamond.Promises.new()
 
         params.directory = params.directory and self:checkDirectory(string.Replace(params.directory, "%BASE%", self:getDirectory())) or self:getDirectory()
-        params.extension = params.extension or "txt"
+        params.extension = params.extension or "png"
         params.url = params.url or params.index and "https://i.imgur.com/" .. params.index .. "." .. params.extension
         params.filename = params.filename or util.CRC(params.url)
 
         local path = params.directory .. "/" .. params.filename .. "." .. params.extension
-        if self.cache[path] then return p:reject(path) end
+        if self.cache[path] then return p:resolve(path) end
 
-        self.cache[path] = true
+        self.cache[params.url] = params
 
         http.Fetch(params.url, (body) =>
             file.CreateDir(params.directory)
             file.Write(path, body)
 
-            return p:resolve(path)
+            params.content = body
+
+            return p:resolve(params)
         end, (err) => p:reject(err) end)
 
         return p
@@ -49,25 +51,35 @@ public class Diamond.Downloader
         local p = Diamond.Promises.new()
         local i = 1
 
-        local function stack(index)
+        local res = {}
+
+        local function stack(index, callback)
             local params = content[index]
             stopif not params
 
-            self:downloadOne(params):next((res) =>
-                p:resolve({
-                    index = index,
-                    params = params,
-                    path = res
-                })
+            self:downloadOne(params):next((params) =>
+                res[index] = params
+
+                if callback then
+                    callback(index)
+                end
 
                 i++
-                stack(i)
-            end, (err) => p:reject(err) end)
+                stack(i, callback)
+            end, (err) => res[index] = { error = err } end)
         end
 
-        stack(i)
+        stack(i, (index) =>
+            if index == #content then
+                p:resolve(res)
+            end
+        end)
 
         return p
+    end
+
+    get(url: string)
+        return self.cache[url] ?? {}
     end
 end
 
@@ -88,29 +100,31 @@ end
 ]]
 
 --[[
-    local downloader = Diamond.Downloader("diamond/files")
-    downloader:download({
-        {
-            index = "I6no46e",
-            extension = "png"
-        },
+    local async function test()
+        local downloader = Diamond.Downloader("diamond/files")
 
-        {
-            directory = "%BASE%/json",
-            url = "https://api.datamuse.com/words?sl=baguette",
-            extension = "json"
-        },
+        local params = await downloader:download({
+            {
+                index = "I6no46e",
+            },
 
-        {
-            url = "https://www.dropbox.com/s/wcphnfttyn1g37e/hackerman.mp3?dl=1",
-            extension = "mp3"
-        },
+            {
+                directory = "%BASE%/json",
+                url = "https://api.datamuse.com/words?sl=baguette",
+                extension = "json"
+            },
 
-        {
-            url = "https://media.discordapp.net/attachments/721524785468932106/797735107338174464/5469a67.png",
-            extension = "png"
-        }
-    }):next((res) =>
-        PrintTable(res)
-    end, (err) => print(err) end)
+            {
+                url = "https://www.dropbox.com/s/wcphnfttyn1g37e/hackerman.mp3?dl=1",
+                extension = "mp3"
+            },
+
+            {
+                url = "https://media.discordapp.net/attachments/721524785468932106/797735107338174464/5469a67.png",
+            }
+        })
+
+        PrintTable(params)
+    end
+    test()
 ]]
