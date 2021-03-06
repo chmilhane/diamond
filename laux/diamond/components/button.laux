@@ -118,7 +118,7 @@ Diamond.Components:register("Diamond:Button", (base, ...) =>
             local textColor = style(self, w, h)
 
             local icon = self:getIcon()
-            draw.SimpleText(self:GetText(), self:GetFont(), x + (icon and 12 or 0), y, textColor ?? theme:get("white"), self:getLabelPosition(), 1)
+            draw.SimpleText(self:GetText(), self:GetFont(), x + (icon and 12 or 0), y, textColor ?? self:GetTextColor(), self:getLabelPosition(), 1)
             if icon then
                 draw.SimpleText(icon.icon,
                     icon.font, 
@@ -126,7 +126,7 @@ Diamond.Components:register("Diamond:Button", (base, ...) =>
                         or self:getLabelPosition() == TEXT_ALIGN_LEFT and x - 20
                         or x - 50, 
                     y, 
-                    theme:get("white"), 
+                    self:GetTextColor(), 
                     self:getLabelPosition(),
                     1
                 )

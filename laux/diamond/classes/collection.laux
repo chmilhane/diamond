@@ -1,12 +1,15 @@
 public class Diamond.Collection
     constructor(tbl: table)
-        self.tbl = tbl
+        self.tbl = table.Copy(tbl)
     end
 
-    where(key, value)
+    where(key, value, lower)
+        key = lower and key:lower() or lower
+        value = lower and value:lower() or value
         local new = {}
         for k, v of self.tbl do
-            continueif v[key] ~= value
+            local val = lower and v[key]:lower() or v[key]
+            continueif value ~= val
             new[#new + 1] = v
         end
         self.tbl = new
@@ -47,7 +50,17 @@ public class Diamond.Collection
         return self
     end
 
+    getKeyWhere(key, value, lower)
+        value = lower and value:lower() or value
+        for k, v of self.tbl do
+            local founded = lower and v[key]:lower() or v[key]
+            continueif istable(value) and not value[founded] or founded ~= value
+            return k
+        end
+    end
+
     first()
+        print(self.tbl)
         return table.GetFirstValue(self.tbl)
     end
 

@@ -23,20 +23,37 @@ public class Diamond.Configurator.Core
         self.categories[#self.categories + 1] = {
             text = text,
             icon = icon,
-            panel = panel
+            panel = panel,
+            configuration = {}
         }
     end
 
-    add(category)
+    getCategoryByNameOrId(category)
+        local id = self.categories[category]
+        if not id then
+            local collection = Diamond.Collection(self.categories)
+            id = collection:getKeyWhere("text", category, true)
+        end
+        return id
+    end
 
+    add(category, index: string|nil, value: table|string|number|boolean)
+        local id = self:getCategoryByNameOrId(category)
+        self.categories[id]["configuration"][index] = value
     end
 
     get(category, index)
-
+        local id = self:getCategoryByNameOrId(category)
+        return self.categories[id]["configuration"][index]
     end
 
     set(category, index, value)
 
+    end
+
+    setDefaultValueForCategory(category, value)
+        local id = self:getCategoryByNameOrId(category)
+        self.categories[id].default = value
     end
 
     save()
@@ -72,7 +89,28 @@ do
         end
     end
 
-    local _settings = Settings()
+    local settings = Settings()
+    settings:add("general", "language", "en")
+    settings:add("permissions", "superadmin", {
+        warns = {
+            view = true,
+            update = true,
+            delete = true,
+        },
+        users = {
+            view = true,
+        }
+    })
+    settings:setDefaultValueForCategory("permissions", {
+        warns = {
+            view = false,
+            update = false,
+            delete = false,
+        },
+        users = {
+            view = false,
+        }
+    })
     -- _settings:get(...)
 end
 

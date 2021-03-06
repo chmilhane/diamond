@@ -6,7 +6,8 @@ local function confirmationPopup(parent, callback)
     popup:fadeIn()
 
     function popup:Paint(w, h)
-        draw.RoundedBox(theme:get("radius"), 0, 0, w, h, theme:alpha("background", 160))
+        Diamond:DrawBlur(self, 6)
+        draw.RoundedBox(theme:get("radius"), 0, 0, w, h, theme:alpha("background", 245))
     end
 
     parent.moveToBack = true
@@ -101,7 +102,7 @@ Diamond.Components:register("Diamond:Configurator:Core", (base, ...) =>
                 local panel
 
                 if Diamond.Components:get(v.panel) then
-                    panel = Diamond.Components:create(v.panel, parent)
+                    panel = Diamond.Components:create(v.panel, parent, configurator)
                 else
                     panel = vgui.Create(v.panel ?? "DScrollPanel", parent)
                 end
@@ -139,6 +140,7 @@ Diamond.Components:register("Diamond:Configurator:Core", (base, ...) =>
             this.y = (h - panelHeight) - 32
             this:CenterHorizontal()
         end
+        self.navbar:SelectPanel(3, true)
 
         local buttons = {
             {

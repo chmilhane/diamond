@@ -1,0 +1,22 @@
+local theme = Diamond.Theme
+
+Diamond.Components:register("Diamond:Scroll", (PANEL, ...) =>
+    function PANEL:Initialize()
+        local vbar = self:GetVBar()
+        vbar:SetWide(12)
+        vbar:SetHideButtons(true)
+        -- putain je sais plus comment qu'on fait pour décaler à gauche quand y a la scrollbar mais ne pas le faire quand elle 
+        -- apparait pas du coup go technique de bledard pour le moment :smart:'
+        vbar.Paint = function(s, w, h)
+            draw.RoundedBox(3, w - 6, 0, 6, h, theme:lighten("background", 0.5))
+        end
+        vbar.btnGrip.Paint = function(s, w, h)
+            draw.RoundedBox(3, w - 6, 0, 6, h, theme:lighten("background", 1))
+        end
+    end
+
+    function PANEL:Paint(w, h)
+    end
+end, "DScrollPanel")
+
+include("diamond/configurator/components/tabs/permissions.lua")

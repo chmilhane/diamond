@@ -46,15 +46,17 @@ Diamond.Components:register("Diamond:CheckBox", (base, ...) =>
 
     function base:Paint(w, h)
         local m = h * 0.2
+        local c = h / 2 - 4
 
         self.color = theme:lerp(FrameTime() * 8, self.color, self:getChecked() and self:getEnabledColor() or self:getDisabledColor())
-        self.anim = Lerp(FrameTime() * 8, self.anim, self:getChecked() and (w - h) or 0)
+        self.anim = Lerp(FrameTime() * 8, self.anim, self:getChecked() and (w - c - 4) or c + 4)
 
         draw.RoundedBox(h / 2, 0, 0, w, h, self.color)
-        draw.RoundedBox(h / 2, m / 2 + self.anim, m / 2, h - m, h - m, self:getBaseColor())
+        -- draw.RoundedBox(h / 2, m / 2 + self.anim, m / 2, h - m, h - m, self:getBaseColor())
+        Diamond:DrawCircle(self.anim, h / 2, c, self:getBaseColor(), _, _, true)
 
         if self:getDrawIcon() then
-            Diamond:DrawIcon(self:getChecked() and "f00c" or "f00d", "Solid", h * 0.65, m / 2 + self.anim + (h - m) / 2, h / 2, 1, 1, self.color)
+            Diamond:DrawIcon(self:getChecked() and "f00c" or "f00d", "Solid", h * 0.5, self.anim, h / 2, 1, 1, self.color)
         end
     end
 end, "DButton")
