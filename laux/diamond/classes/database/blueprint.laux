@@ -1,0 +1,70 @@
+class Column
+    constructor(key, type)
+        self.key = key
+        self.type = type
+    end
+
+    default(value)
+        self.default = value
+        return self
+    end
+
+    auto_increment()
+        self.auto_increment = true
+        return self
+    end
+
+    change()
+        self._change = true
+        return self
+    end
+
+    drop()
+        self.remove = true
+        return self
+    end
+end
+
+class Blueprint
+    columns = {}
+    _get _set name
+    _get _set method
+
+    constructor(name, method)
+        self:setName(name)
+        self:setMethod(method)
+    end
+
+    add(name, type)
+        local column = Column(name, type)
+        self.columns[#self.columns + 1] = column
+        return column
+    end
+
+    id(key = "id")
+        return self:add(key, "integer"):auto_increment()
+    end
+
+    increments(key = "id")
+        return self:add(key, "integer"):auto_increment()
+    end
+
+    increment(key = "id")
+        return self:add(key, "integer"):auto_increment()
+    end
+
+    string(key, length = 255)
+        return self:add(key, `VARCHAR(${length})`)
+    end
+
+    timestamp(key)
+        return self:add(key, "TIMESTAMP")
+    end
+
+    timestamps()
+        self:timestamp("updated_at"):default("CURRENT_TIMESTAMP")
+        self:timestamp("created_at"):default("CURRENT_TIMESTAMP")
+    end
+end
+
+return Blueprint

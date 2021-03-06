@@ -1,17 +1,13 @@
 Diamond.DB.Drivers ??= {}
 
-class Driver
+public class Diamond.DB.Drivers.MySQL
     static auto_increments()
-        return "AUTO_INCREMENT"
+        return "AUTOINCREMENT"
     end
 end
 
-public class Diamond.DB.Drivers.MySQL extends Driver
-    
-end
-
-public class Diamond.DB.Drivers.SQLite extends Driver
+public class Diamond.DB.Drivers.SQLite
     static auto_increments()
-        return "AUTOINCREMENT"
+        return "AUTO_INCREMENT"
     end
 end

@@ -1,0 +1,78 @@
+local Blueprint = include("diamond/classes/database/blueprint.lua")
+
+public class Diamond.Schema
+    static create(_, name, callback)
+        local bp = Blueprint(name, "CREATE")
+        callback(bp)
+
+        Diamond.Schema:run(bp)
+    end
+
+    static table(_, name, callback)
+        local bp = Blueprint(name, "ALTER")
+        callback(bp)
+
+        Diamond.Schema:run(bp)
+    end
+
+    static columnSql(_, column)
+        local col = column.key .." " ..column.type
+        for k, v in pairs(column) do
+            continueif k == "key" or k == "type" or k == "_change" or k == "remove"
+            col ..= isbool(v) and " " ..k or " " ..k .." " ..((isstring(v) and v ~= "CURRENT_TIMESTAMP") and MySQLite.SQLStr(v) or v)
+        end
+        return col
+    end
+
+    static alter(_, name, column)
+        local query = ""
+        query ..= "ALTER TABLE " ..name
+        if column._change then -- update don't work in sqlite, find a solution for it it by using the "driver class"
+            local c = Diamond.Schema:columnSql(column)
+            query ..= " ALTER COLUMN " ..c
+        elseif column.remove then  -- remove don't work in sqlite, find a solution for it by using the "driver class"
+            query ..= " DROP " ..column.key
+        else
+            local c = Diamond.Schema:columnSql(column)
+            query ..= " ADD " ..c
+        end
+        return query
+    end
+
+    toSql(blueprint)
+        local query = ""
+        local name = blueprint:getName()
+        local method = blueprint:getMethod()
+        local columns = blueprint.columns
+
+        if method == "CREATE" then
+            query ..= "CREATE TABLE IF NOT EXISTS " ..name .."(\n\t"
+
+            for k, v in ipairs(columns) do
+                local c = self:columnSql(v)
+                query ..= k == #columns and c or c ..", \n\t"
+            end
+            query ..= "\n)"
+        elseif method == "ALTER" then
+            for k, v in ipairs(columns) do
+                local q = self:alter(name, v)
+                query ..= #columns ~= k and q ..";\n\t" or q 
+            end
+        end
+
+        return query
+    end
+
+    run(blueprint)
+        local query = self:toSql(blueprint)
+        print(query)
+        MySQLite.query(query, function(success)
+            print("success", success)
+        end, function(error)
+            print("error", error)
+        end)
+    end
+end
+
+include("diamond/classes/database/migrations/0_create_diamond_table.lua")
+include("diamond/classes/database/migrations.lua")

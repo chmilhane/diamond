@@ -1,5 +1,5 @@
 public class Diamond.Collection
-    constructor(tbl: table)
+    constructor(tbl: table|Column)
         self.tbl = table.Copy(tbl)
     end
 

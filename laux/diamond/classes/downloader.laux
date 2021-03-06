@@ -99,32 +99,31 @@ end
     - .ogg
 ]]
 
---[[
-    local async function test()
-        local downloader = Diamond.Downloader("diamond/files")
 
-        local params = await downloader:download({
-            {
-                index = "I6no46e",
-            },
+-- local async function test()
+--     local downloader = Diamond.Downloader("diamond/files")
 
-            {
-                directory = "%BASE%/json",
-                url = "https://api.datamuse.com/words?sl=baguette",
-                extension = "json"
-            },
+--     local params = await downloader:download({
+--         {
+--             index = "I6no46e",
+--         },
 
-            {
-                url = "https://www.dropbox.com/s/wcphnfttyn1g37e/hackerman.mp3?dl=1",
-                extension = "mp3"
-            },
+--         {
+--             directory = "%BASE%/json",
+--             url = "https://api.datamuse.com/words?sl=baguette",
+--             extension = "json"
+--         },
 
-            {
-                url = "https://media.discordapp.net/attachments/721524785468932106/797735107338174464/5469a67.png",
-            }
-        })
+--         {
+--             url = "https://www.dropbox.com/s/wcphnfttyn1g37e/hackerman.mp3?dl=1",
+--             extension = "mp3"
+--         },
 
-        PrintTable(params)
-    end
-    test()
-]]
+--         {
+--             url = "https://media.discordapp.net/attachments/721524785468932106/797735107338174464/5469a67.png",
+--         }
+--     })
+
+--     PrintTable(params)
+-- end
+-- test()

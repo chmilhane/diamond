@@ -1,0 +1,28 @@
+-- class Migrations extends Diamond.Migrations
+--     constructor()
+--         super()
+--     end
+
+--     up()
+--         Diamond.Schema:create("diamond_migrations", function(table: Blueprint)
+--             table:id()
+--             table:string("name", 255):default("ça digaz")
+--             table:timestamps()
+--         end)
+--     end
+-- end
+
+class Migrations extends Diamond.Migrations
+    constructor()
+        super()
+    end
+
+    up()
+        Diamond.Schema:table("diamond_migrations", function(table: Blueprint)
+            table:string("af", 100)
+            -- table:string("name", 255):default("ok"):change()
+        end)
+    end
+end
+
+Migrations()
