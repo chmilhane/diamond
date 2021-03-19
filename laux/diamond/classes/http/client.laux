@@ -1,0 +1,49 @@
+local function format(value: string)
+    return string.Replace(value, " ", "%20")
+end
+
+public class Diamond.HttpClient
+    _get _set baseAdress
+    _get _set defaultRequestHeaders
+    _get _set defaultMethod
+    _get _set defaultParameters
+
+    constructor()
+        self:setDefaultMethod("GET")
+    end
+
+    fetch(params: table)
+        local promise = Diamond.Promises.new()
+
+        local request = {}
+        request.url = (self:getBaseAdress() and params.url) and self:getBaseAdress() .. format(params.url) or params.url and format(params.url)
+        request.method = params.method ?? self:getDefaultMethod()
+        request.headers = params.headers or self:getDefaultRequestHeaders() or {}
+        request.parameters = self:getDefaultParameters() or {}
+        request.success = (statusCode, body, headers) =>
+            promise:resolve(Diamond.HttpResponseMessage({
+                body = body,
+                statusCode = statusCode,
+                headers = headers
+            }))
+        end
+        request.failed = (e) =>
+            promise:reject(e)
+        end
+
+        return promise, HTTP(request)
+    end
+end
+
+--[[
+    local async function request()
+        local client = Diamond.HttpClient()
+
+        local response = await client:fetch({
+            url = "https://api.datamuse.com/words?sl=baguette"
+        })
+
+        print(response:getStatusCode(), response:isSuccessStatusCode())
+    end
+    request()
+]]

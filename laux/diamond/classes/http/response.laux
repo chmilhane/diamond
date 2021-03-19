@@ -1,0 +1,42 @@
+local function isBetween(i, min, max)
+    return i >= min and i <= max
+end
+
+public class Diamond.HttpResponseMessage
+    _get _set content
+    _get _set headers
+    _get statusCode
+
+    constructor(response = {}: table)
+        self:setContent({
+            body = response?.body,
+            size = string.len(response?.body)
+        })
+        self:setHeaders(response.headers ?? {})
+        self:setStatusCode(response?.statusCode ?? 0)
+    end
+
+    setStatusCode(statusCode)
+        self.statusCode = statusCode
+    end
+
+    isInformationalStatusCode()
+        return isBetween(self:getStatusCode(), 100, 199)
+    end
+
+    isSuccessStatusCode()
+        return isBetween(self:getStatusCode(), 200, 299)
+    end
+
+    isRedirectStatusCode()
+        return isBetween(self:getStatusCode(), 300, 399)
+    end
+
+    isClientErrorStatusCode()
+        return isBetween(self:getStatusCode(), 400, 499)
+    end
+
+    isServerErrorStatusCode()
+        return isBetween(self:getStatusCode(), 500, 599)
+    end
+end
