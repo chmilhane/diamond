@@ -1,174 +1,318 @@
 import Lerp, LerpColor from Diamond.Animations
 local theme, lang = Diamond.Theme, Diamond.Language
 
-Diamond.Components:register("Diamond:Frame", (base, ...) =>
-	base:accessorFunc("draggable", FORCE_BOOL)
-	base:accessorFunc("screenLock", FORCE_BOOL)
+-- Diamond.Components:register("Diamond:Frame", (base, ...) =>
+-- 	base:accessorFunc("draggable", FORCE_BOOL)
+-- 	base:accessorFunc("screenLock", FORCE_BOOL)
 
-	function base:Initialize()
-		local titleFont = Diamond:Font(20)
-		local closeFont = Diamond:Font(20, { font = "Font Awesome 5 Free Solid" })
+-- 	function base:Initialize()
+-- 		local titleFont = Diamond:Font(20)
+-- 		local closeFont = Diamond:Font(20, { font = "Font Awesome 5 Free Solid" })
 
-		self:setDraggable(true)
-		self:setScreenLock(false)
+-- 		self:setDraggable(true)
+-- 		self:setScreenLock(false)
 
-		self:fadeIn(0.25, _, (x) => return x end)
+-- 		self:fadeIn(0.25, _, (x) => return x end)
 
-		self.header = self:Add("Panel")
-		self.header:Dock(TOP)
-		self.header.Paint = (this, w, h) =>
-			local color = this.color ?? theme:lighten("background", 0.25)
-			draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, color, true, true, false, false)
-		end
-		self.header.OnMousePressed = function(this)
-			stopif not self:getDraggable()
+-- 		self.header = self:Add("Panel")
+-- 		self.header:Dock(TOP)
+-- 		self.header.Paint = (this, w, h) =>
+-- 			local color = this.color ?? theme:lighten("background", 0.25)
+-- 			draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, color, true, true, false, false)
+-- 		end
+-- 		self.header.OnMousePressed = function(this)
+-- 			stopif not self:getDraggable()
 
-			local screenX, screenY = self:LocalToScreen(0, 0)
-			self.Dragging = { gui.MouseX() - self.x, gui.MouseY() - self.y }
-			this:MouseCapture(true)
-		end
-		self.header.OnMouseReleased = function(this)
-			stopif not self:getDraggable()
+-- 			local screenX, screenY = self:LocalToScreen(0, 0)
+-- 			self.Dragging = { gui.MouseX() - self.x, gui.MouseY() - self.y }
+-- 			this:MouseCapture(true)
+-- 		end
+-- 		self.header.OnMouseReleased = function(this)
+-- 			stopif not self:getDraggable()
 
-			self.Dragging = nil
-			this:MouseCapture(false)
-		end
-		self.header.Think = function(this)
-			stopif not self:getDraggable()
+-- 			self.Dragging = nil
+-- 			this:MouseCapture(false)
+-- 		end
+-- 		self.header.Think = function(this)
+-- 			stopif not self:getDraggable()
 
-			local mousex = math.Clamp(gui.MouseX(), 1, ScrW() - 1)
-			local mousey = math.Clamp(gui.MouseY(), 1, ScrH() - 1)
+-- 			local mousex = math.Clamp(gui.MouseX(), 1, ScrW() - 1)
+-- 			local mousey = math.Clamp(gui.MouseY(), 1, ScrH() - 1)
 		
-			if self.Dragging then
-				local x = mousex - self.Dragging[1]
-				local y = mousey - self.Dragging[2]
+-- 			if self.Dragging then
+-- 				local x = mousex - self.Dragging[1]
+-- 				local y = mousey - self.Dragging[2]
 		
-				-- Lock to screen bounds if screenlock is enabled
-				if (self:getScreenLock()) then
-					x = math.Clamp(x, 0, ScrW() - self:GetWide())
-					y = math.Clamp(y, 0, ScrH() - self:GetTall())
-				end
+-- 				-- Lock to screen bounds if screenlock is enabled
+-- 				if (self:getScreenLock()) then
+-- 					x = math.Clamp(x, 0, ScrW() - self:GetWide())
+-- 					y = math.Clamp(y, 0, ScrH() - self:GetTall())
+-- 				end
 		
-				self:SetPos(x, y)
-			end
+-- 				self:SetPos(x, y)
+-- 			end
 
-			if (this:IsHovered()) then
-				this:SetCursor("sizeall")
-			else
-				this:SetCursor("arrow")
-			end
-		end
+-- 			if (this:IsHovered()) then
+-- 				this:SetCursor("sizeall")
+-- 			else
+-- 				this:SetCursor("arrow")
+-- 			end
+-- 		end
 
-		self.title = self.header:Add("DLabel")
-		self.title:Dock(LEFT)
-		self.title:DockMargin(16, 0, 0, 0)
-		self.title:SetFont(titleFont)
-		self.title:SetTextColor(theme:get("text"))
-		self:SetTitle("Window")
+		-- self.title = self.header:Add("DLabel")
+		-- self.title:Dock(LEFT)
+		-- self.title:DockMargin(16, 0, 0, 0)
+		-- self.title:SetFont(titleFont)
+		-- self.title:SetTextColor(theme:get("text"))
+		-- self:SetTitle("Window")
 
-		self.close = self.header:Add("DButton")
-		self.close:Dock(RIGHT)
-		self.close:SetText("")
-		self.close.colors = {
-			i = theme:lighten("text", -0.2),
-			o = theme:get("text")
-		}
-		self.close.buttonColor = self.close.colors.i
-		self.close.Paint = (this, w, h) =>
-			local iconWidth, iconHeight = w / 3.25, h / 3.25
-			surface.SetDrawColor(this.buttonColor)
-			surface.SetMaterial(Diamond.Core.Settings.Materials.closeButton)
-			surface.DrawTexturedRect(w / 2 - iconWidth / 2, h / 2 - iconHeight / 2, iconWidth, iconHeight)
-		end
-		self.close.OnCursorEntered = (this) =>
-			LerpColor("buttonColor",  self.close.colors.o, this)
-		end
-		self.close.OnCursorExited = (this) =>
-			LerpColor("buttonColor",  self.close.colors.i, this)
-		end
-		self.close.DoClick = () => 
-			self:Close()
-		end
+-- 		self.close = self.header:Add("DButton")
+-- 		self.close:Dock(RIGHT)
+-- 		self.close:SetText("")
+-- 		self.close.colors = {
+-- 			i = theme:lighten("text", -0.2),
+-- 			o = theme:get("text")
+-- 		}
+-- 		self.close.buttonColor = self.close.colors.i
+-- 		self.close.Paint = (this, w, h) =>
+-- 			local iconWidth, iconHeight = w / 3.25, h / 3.25
+-- 			surface.SetDrawColor(this.buttonColor)
+-- 			surface.SetMaterial(Diamond.Core.Settings.Materials.closeButton)
+-- 			surface.DrawTexturedRect(w / 2 - iconWidth / 2, h / 2 - iconHeight / 2, iconWidth, iconHeight)
+-- 		end
+-- 		self.close.OnCursorEntered = (this) =>
+-- 			LerpColor("buttonColor",  self.close.colors.o, this)
+-- 		end
+-- 		self.close.OnCursorExited = (this) =>
+-- 			LerpColor("buttonColor",  self.close.colors.i, this)
+-- 		end
+-- 		self.close.DoClick = () => 
+-- 			self:Close()
+-- 		end
 
-		Diamond:on("themeChanged", (oldTheme, newTheme) =>
-			stopif not self or not IsValid(self)
+-- 		Diamond:on("themeChanged", (oldTheme, newTheme) =>
+-- 			stopif not self or not IsValid(self)
 
-			self.title:SetTextColor(theme:get("text"))
-			self.close.colors = {
-				i = theme:lighten("text", -0.2),
-				o = theme:get("text")
+-- 			self.title:SetTextColor(theme:get("text"))
+-- 			self.close.colors = {
+-- 				i = theme:lighten("text", -0.2),
+-- 				o = theme:get("text")
+-- 			}
+-- 			self.close.buttonColor = self.close.colors.i
+-- 		end)
+-- 	end
+
+-- 	function base:ShowCloseButton(bool)
+-- 		self.close:SetVisible(bool)
+-- 	end
+
+-- 	function base:GetHeaderColor()
+-- 		return self.header.color
+-- 	end
+
+-- 	function base:SetHeaderColor(color)
+-- 		self.header.color = color
+-- 	end
+
+-- 	function base:Paint(w, h)
+-- 		-- local x, y = self:LocalToScreen()
+
+-- 		-- Diamond.Shadows.BeginShadow()
+-- 			draw.RoundedBox(theme:get("radius"), 0, 0, w, h, theme:get("background"))
+-- 		-- Diamond.Shadows.EndShadow(1, 2, 2, 255, 0, 0)
+-- 	end
+
+-- 	function base:GetTitle()
+-- 		return self.title:GetText()
+-- 	end
+
+-- 	function base:SetTitle(title = "Window": string)
+-- 		self.title:SetText(title)
+-- 		self.title:SizeToContents()
+-- 	end
+
+-- 	function base:Close()
+-- 		self:fadeOut(0.25, (panel) ->
+-- 			base:Remove()
+-- 		end, (x) => return x end)
+-- 	end
+
+-- 	function base:PerformLayout(w, h)
+-- 		local headerHeight = 45
+
+-- 		if (self.header) then self.header:SetTall(headerHeight) end
+-- 		if (self.close) then self.close:SetWide(headerHeight) end
+-- 	end
+-- end, "EditablePanel")
+
+public class Diamond.Components.Frame extends Diamond.Component
+	constructor(parent, props)
+		super(istable(parent) and _ or parent, "EditablePanel", {
+			title = {
+				value = "Window",
+				force = FORCE_STRING,
+				methods = {
+					["get"] = true
+				}
+			},
+			showCloseButton = {
+				value = true,
+				force = FORCE_BOOL,
+				methods = {
+					["get"] = true
+				}
+			},
+			draggable = {
+				value = true,
+				force = FORCE_BOOL
+			},
+			screenLock = {
+				value = false,
+				force = FORCE_BOOL
+			},
+			headerHeight = {
+				value = 45,
+				force = FORCE_NUMBER
+			},
+			headerColor = theme:lighten("background", 0.25),
+			backgroundColor = theme:get("background"),
+			easeFunction = Diamond.Animations.Ease:get("linear"),
+			fadeDuration = {
+				value = 0.25,
+				force = FORCE_NUMBER
 			}
-			self.close.buttonColor = self.close.colors.i
-		end)
+		}, istable(parent) and parent or props)
 	end
 
-	function base:ShowCloseButton(bool)
-		self.close:SetVisible(bool)
+	render(component)
+		function component:initialize(props)
+			local titleFont = Diamond:Font(20)
+			local closeFont = Diamond:Font(20, { font = "Font Awesome 5 Free Solid" })
+
+			self.header = self:Add("Panel")
+			self.header:Dock(TOP)
+			self.header.Paint = (this, w, h) =>
+				draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, self:getHeaderColor(), true, true, false, false)
+			end
+			self.header.OnMousePressed = function(this)
+				stopif not self:getDraggable()
+
+				local screenX, screenY = self:LocalToScreen(0, 0)
+				self.Dragging = { gui.MouseX() - self.x, gui.MouseY() - self.y }
+				this:MouseCapture(true)
+			end
+			self.header.OnMouseReleased = function(this)
+				stopif not self:getDraggable()
+
+				self.Dragging = nil
+				this:MouseCapture(false)
+			end
+			self.header.Think = function(this)
+				stopif not self:getDraggable()
+
+				local mousex = math.Clamp(gui.MouseX(), 1, ScrW() - 1)
+				local mousey = math.Clamp(gui.MouseY(), 1, ScrH() - 1)
+			
+				if self.Dragging then
+					local x = mousex - self.Dragging[1]
+					local y = mousey - self.Dragging[2]
+			
+					-- Lock to screen bounds if screenlock is enabled
+					if (self:getScreenLock()) then
+						x = math.Clamp(x, 0, ScrW() - self:GetWide())
+						y = math.Clamp(y, 0, ScrH() - self:GetTall())
+					end
+			
+					self:SetPos(x, y)
+				end
+
+				if (this:IsHovered()) then
+					this:SetCursor("sizeall")
+				else
+					this:SetCursor("arrow")
+				end
+			end
+
+			self.header.title = self.header:Add("DLabel")
+			self.header.title:Dock(LEFT)
+			self.header.title:DockMargin(16, 0, 0, 0)
+			self.header.title:SetFont(titleFont)
+			self.header.title:SetTextColor(theme:get("text"))
+			self:setTitle(self:getTitle())
+
+			self.header.closeButton = self.header:Add("DButton")
+			self.header.closeButton:Dock(RIGHT)
+			self.header.closeButton.DoClick = () =>
+				self:Close()
+			end
+			self:setShowCloseButton(self:getShowCloseButton())
+
+			self:fadeIn(self:getFadeDuration(), _, (x) => return self:getEaseFunction()(x) end)
+		end
+
+		function component:setTitle(title = "Window": string)
+			self.title = title
+			self.header.title:SetText(self.title)
+			self.header.title:SizeToContents()
+		end
+
+		function component:setShowCloseButton(showCloseButton = true: boolean)
+			self.showCloseButton = showCloseButton
+			self.header.closeButton:SetVisible(self.showCloseButton)
+		end
+
+		function component:Paint(w, h)
+			-- local x, y = self:LocalToScreen()
+
+			-- Diamond.Shadows.BeginShadow()
+				draw.RoundedBox(theme:get("radius"), 0, 0, w, h, self:getBackgroundColor())
+			-- Diamond.Shadows.EndShadow(1, 2, 2, 255, 0, 0)
+		end
+
+		function component:Close()
+			self:fadeOut(self:getFadeDuration(), () =>
+				if IsValid(self) then self:Remove() end
+			end, (x) => return self:getEaseFunction()(x) end)
+		end
+
+		function component:PerformLayout(w, h)
+			local headerHeight = self:getHeaderHeight()
+
+			if self.header then self.header:SetTall(headerHeight) end
+			if self.close then self.close:SetWide(headerHeight) end
+		end
+
+		return component
 	end
-
-	function base:GetHeaderColor()
-		return self.header.color
-	end
-
-	function base:SetHeaderColor(color)
-		self.header.color = color
-	end
-
-	function base:Paint(w, h)
-		-- local x, y = self:LocalToScreen()
-
-		-- Diamond.Shadows.BeginShadow()
-			draw.RoundedBox(theme:get("radius"), 0, 0, w, h, theme:get("background"))
-		-- Diamond.Shadows.EndShadow(1, 2, 2, 255, 0, 0)
-	end
-
-	function base:GetTitle()
-		return self.title:GetText()
-	end
-
-	function base:SetTitle(title = "Window": string)
-		self.title:SetText(title)
-		self.title:SizeToContents()
-	end
-
-	function base:Close()
-		self:fadeOut(0.25, (panel) ->
-			base:Remove()
-		end, (x) => return x end)
-	end
-
-	function base:PerformLayout(w, h)
-		local headerHeight = 45
-
-		if (self.header) then self.header:SetTall(headerHeight) end
-		if (self.close) then self.close:SetWide(headerHeight) end
-	end
-end, "EditablePanel")
+end
 
 local function openMenu(client)
-	local frame = Diamond.Components:create("Diamond:Frame")
+	local frame = Diamond.Components.Frame({
+		title = "Test",
+		showCloseButton = false
+	}):create()
 	frame:SetSize(900, 600)
 	frame:MakePopup()
 	frame:Center()
 
-	local sidebar = Diamond.Components:create("Diamond:Sidebar", frame)
-	sidebar:SetContainer(frame, 0)
-	sidebar:Dock(LEFT)
-	sidebar:SetWide(250)
-	sidebar:AddCard("Diamond:Cards:Player", 70, () ->
-		self:setRadius(4)
-	end)
-	sidebar:AddPanel(lang:get("core.components.sidebar.dashboard"), utf8.char(0xf3fd), "Diamond:Tabs:Dashboard", { --[[ BackgroundColor = theme:get("purple"), ]] Radius = 4 })
-	sidebar:AddPanel(lang:get("core.components.sidebar.preferences"), utf8.char(0xf085), "Diamond:Tabs:Preferences", { --[[ BackgroundColor = theme:get("blue"), ]] Radius = 4 })
-	sidebar:AddPanel("Test", utf8.char(0xf15c), () ->
-		local button = Diamond.Components:create("Diamond:Button", self)
-		button:Dock(TOP)
-		button:DockMargin(16, 16, 16, 16)
-		button:setBackgroundColor(theme:get("preference"))
-		button:SetText("Default")
-		button:SetTall(46)
-		button:setRadius(8)
-		button:setTranslationY(-4)
-	end, { BackgroundColor = theme:get("orange"), Radius = 4 })
+	-- local sidebar = Diamond.Components:create("Diamond:Sidebar", frame)
+	-- sidebar:SetContainer(frame, 0)
+	-- sidebar:Dock(LEFT)
+	-- sidebar:SetWide(250)
+	-- sidebar:AddCard("Diamond:Cards:Player", 70, () ->
+	-- 	self:setRadius(4)
+	-- end)
+	-- sidebar:AddPanel(lang:get("core.components.sidebar.dashboard"), utf8.char(0xf3fd), "Diamond:Tabs:Dashboard", { --[[ BackgroundColor = theme:get("purple"), ]] Radius = 4 })
+	-- sidebar:AddPanel(lang:get("core.components.sidebar.preferences"), utf8.char(0xf085), "Diamond:Tabs:Preferences", { --[[ BackgroundColor = theme:get("blue"), ]] Radius = 4 })
+	-- sidebar:AddPanel("Test", utf8.char(0xf15c), () ->
+	-- 	local button = Diamond.Components:create("Diamond:Button", self)
+	-- 	button:Dock(TOP)
+	-- 	button:DockMargin(16, 16, 16, 16)
+	-- 	button:setBackgroundColor(theme:get("preference"))
+	-- 	button:SetText("Default")
+	-- 	button:SetTall(46)
+	-- 	button:setRadius(8)
+	-- 	button:setTranslationY(-4)
+	-- end, { BackgroundColor = theme:get("orange"), Radius = 4 })
 end
 concommand.Add("diamond", openMenu)

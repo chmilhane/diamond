@@ -1,54 +1,118 @@
-local __cache = {}
+Diamond.Components ??= {}
 
-local PANEL = FindMetaTable("Panel") or {}
-function PANEL:accessorFunc(variable: string, force)
-    local name = variable:gsub("^%l", string.upper)
+public class Diamond.Component
+    _get _set base
+    _get _set parent
 
-    self["get" .. name] = () ->
-        return self[variable]
-    end
+    constructor(parent, base = "Panel": string, props = {}: table, overwrittenProps = {}: table)
+        self:setParent(parent)
+        self:setBase(base)
 
-    self["set" .. name] = (value) ->
-        self[variable] = force == FORCE_STRING and tostring(value) or
-                         force == FORCE_NUMBER and tonumber(value) or
-                         force == FORCE_BOOL   and tobool(value)   or
-                         value
-    end
-end
+        Diamond:log(overwrittenProps)
 
-public class Diamond.Components
-    static get(this, name)
-        return (isstring(name) and __cache[name]) and true or false
-    end
-
-    static create(this, name: string, parent, ...)
-        local v = __cache[name]
-        stopif not v or not istable(v)
-
-        local base = nil
-        local hasPanel = this:get(v.base)
-
-        if hasPanel then
-            base = this:create(v.base, parent)
-        else
-            base = vgui.Create(v.base, parent)
+        for i, v in pairs(overwrittenProps) do
+            if istable(props[i]) then
+                props[i].value = v
+            else
+                props[i] = v
+            end
         end
 
-        if v.panel and isfunction(v.panel) then
-            v.panel(base, ...)
-        end
-
-        if base.Initialize and isfunction(base.Initialize) and not hasPanel then
-            base:Initialize()
-        end
-
-        return base
+        self.props = props
     end
 
-    static register(this, name: string, panel, base = "Panel": string)
-        __cache[name] = {
-            panel = panel,
-            base = base
+    static accessorFunc(this, panel: Panel|table, variable: string, force, methods)
+        local name = variable:gsub("^%l", string.upper)
+        local forces = {
+            [FORCE_STRING] = () -> return tostring(self) end,
+            [FORCE_NUMBER] = () -> return tonumber(self) end,
+            [FORCE_BOOL] = () -> return tobool(self) end
         }
+
+        methods = methods or {
+            ["get"] = true,
+            ["set"] = true,
+        }
+
+        if methods["get"] then
+            panel["get" .. name] = () ->
+                local x = panel[variable]
+                return istable(x) and x.value or x
+            end
+        end
+
+        if methods["set"] then
+            panel["set" .. name] = (value) ->
+                panel[variable] = forces?[force] or value
+
+                if self.onPropsChanged and isfunction(self.onPropsChanged) then
+                    self:onPropsChanged(variable, value, self.props ?? {})
+                end
+            end
+        end
     end
+
+    create()
+        local base = self:getBase()
+        local parent = self:getParent()
+        local props = self.props
+
+        local component = vgui.Create(base, parent)
+        component.props = props
+        component = self:render(component)
+
+        function component:updateProps(props = {}: table)
+            for i, v in pairs(table.Merge(self.props, props)) do
+                Diamond.Component:accessorFunc(component, i, istable(v) and v?.force, istable(v) and v?.methods)
+                component[i] = istable(v) and v.value or v
+            end
+        end
+        component:updateProps(props)
+
+        if component.initialize and isfunction(component.initialize) then
+            component:initialize(component.props)
+        end
+
+        return component
+    end
+
+    render(...) return ... end
 end
+
+--[[
+    public class Diamond.Components.App extends Diamond.Component
+        constructor(parent, props)
+            super(parent, "DPanel", {
+                title = "Window"
+            }, props)
+        end
+
+        render(component)
+            function component:initialize(props)
+                self:setTitle("Test")
+            end
+
+            function component:onPropsChanged(index, value, props)
+                print(index, value)
+                PrintTable(props)
+            end
+
+            function component:Paint(w, h)
+                draw.RoundedBox(0, 0, 0, w, h, Color(255, 0, 0))
+                draw.SimpleText(self:getTitle(), "Trebuchet24", w / 2, h / 2, color_white, 1, 1)
+            end
+
+            return component
+        end
+    end
+
+    do
+        local frame = vgui.Create("DFrame")
+        frame:SetSize(700, 600)
+        frame:Center()
+        frame:MakePopup()
+
+        local panel = Diamond.Components.App(frame):create()
+        panel:Dock(FILL)
+    end
+]]
