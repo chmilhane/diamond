@@ -28,6 +28,16 @@ public class Diamond.Core.Language
         end
     end
 
+    async download(index: string, url: string)
+        local client = Diamond.HttpClient()
+        local result = await client:fetch(url)
+
+        local content = util.JSONToTable(result.content) ?? {}
+        self:add(index, content)
+
+        return result
+    end
+
     get(index, ...)
         if not index then return self.cache end
         
