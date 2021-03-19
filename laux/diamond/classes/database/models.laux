@@ -7,7 +7,7 @@ class HasMany
 
     getValues()
         if self.singleItem then
-            return {self.response[self.model.pk]}
+            return self.response[self.model.pk]
         end
         local values = {}
         for k, v in ipairs(self.response) do
@@ -20,12 +20,16 @@ class HasMany
         stopif self.singleItem == nil
 
         local vals = self:getValues()
-        local res = self.model.cls():whereIn(self.model.fk, vals):get()
-        local collection = Diamond.Collection(res):regroup(self.model.fk):get()
-
         local tbl = self.response
-        for k, v in pairs(tbl) do
-            tbl[k][self.model.method] = collection[v[self.model.pk]]
+
+        if tbl.id then
+            tbl[self.model.method] = self.model.cls():where(self.model.fk, vals):get()
+        else
+            local res = self.model.cls():whereIn(self.model.fk, vals):get()
+            local collection = Diamond.Collection(res):regroup(self.model.fk):get()
+            for k, v in pairs(tbl) do
+                tbl[k][self.model.method] = collection[v[self.model.pk]]
+            end
         end
         return tbl
     end
@@ -94,13 +98,16 @@ public class Diamond.Models
         return self.connection:toSql()
     end
 
+    find(value, key = "id")
+        return self:where(key, value):first()
+    end
+
     first()
         local res = self.connection:first()
         local relationships = self.relationships
         if relationships and #relationships > 0 then
             for k, v in ipairs(relationships) do
-                local db = v.cls():where(v.fk, res[v.pk]):get()
-                res[v.method] = db
+                res = v.type(v, k, res):retrieve()
             end
         end
         return res
@@ -121,3 +128,15 @@ public class Diamond.Models
         return res
     end
 end
+
+-- local req = Diamond.DB('batk_users')
+--     :where('name', 'Brique au bob')
+--     :join('batk_warns', 'steamid64', '=', 'user_id')
+
+-- print("ok", BATK.Users():with("warns"):first())
+-- print(BATK.Users():with("warns"):get())
+-- print("req", 
+--     -- req:toSql(),
+--     -- req:get(),
+--     BATK.Users():with("warns"):first()
+-- )

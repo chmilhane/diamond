@@ -1,0 +1,22 @@
+migrations = table.Count(migrations) < 2 and migrations or {}
+print(migrations)
+
+public class Diamond.Migrations
+    constructor()
+        self.name = self:__type()
+        migrations[#migrations + 1] = self
+    end
+
+    run()
+        self:up()
+        return "RUNNED"
+    end
+end
+
+local function run()
+    for k, v in ipairs(migrations) do
+        v:run()
+    end
+end
+run()
+concommand.Add("migrate", run)

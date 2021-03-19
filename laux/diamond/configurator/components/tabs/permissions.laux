@@ -1,3 +1,146 @@
-Diamond.Components:register("Diamond:Configurator:Tabs:Permissions", (base, ...) =>
+local theme = Diamond.Theme
 
+local colors = {
+    superadmin = theme:get("red"),
+    admin = theme:get("blue"),
+    vip = theme:get("yellow"),
+}
+local icons = {
+    superadmin = utf8.char(0xf6e3),
+    admin = utf8.char(0xf3ed),
+    vip = utf8.char(0xf005),
+}
+
+Diamond.Components:register("Diamond:Configurator:Tabs:Permissions", (base, configuration) =>
+    local parent = base:GetParent()
+    local w, h = parent:GetSize()
+
+    local sidebar = Diamond.Components:create("Diamond:Sidebar", base, 0)
+    sidebar:Dock(LEFT)
+    sidebar:SetWide(w / 3.5)
+    sidebar:setBackgroundColor(theme:lighten("background", 0.3))
+    sidebar:setRounded({true, true, true, true})
+    sidebar:GetContainer():DockMargin(16, 0, 0, 0)
+
+    local categories = configuration.categories
+    local settings = Diamond.Collection(categories):where("text", "permissions", true):first()
+    for k, v in pairs(CAMI.GetUsergroups()) do
+        local perms = settings.configuration[k]
+        sidebar:AddPanel(k, icons[k] or icons[v.Inherits] or utf8.char(0xf007), (parent) =>
+            local editor = vgui.Create("DPanel", parent)
+            editor:Dock(FILL)
+            editor:DockPadding(16, 16, 16, 16)
+            function editor:Paint(w, h)
+                draw.RoundedBox(theme:get("radius"), 0, 0, w, h, theme:lighten("background", 0.3))
+            end
+
+            local scroll = Diamond.Components:create("Diamond:Scroll", editor)
+            scroll:Dock(FILL)
+
+            local title = vgui.Create("DLabel", scroll)
+            title:Dock(TOP)
+            title:SetText(`Utilise le système de permissions de ${configuration.package.name} pour ajouter des permissions à tes rôles!`)
+            title:SetFont(Diamond:Font(22, { weight = 500 }))
+            title:SetTextColor(theme:get("text"))
+            title:SetWrap(true)
+            title:SetAutoStretchVertical(true)
+
+            if v.Inherits and v.Inherits ~= k then
+                local popupHerit = vgui.Create("DPanel", scroll)
+                popupHerit:Dock(TOP)
+                popupHerit:DockMargin(0, 16, 0, 0)
+                popupHerit:DockPadding(16, 16, 16, 16)
+                popupHerit:SetTall(100)
+                function popupHerit:Paint(w, h)
+                    Diamond:DrawRoundedRect(theme:get("radius"), 0, 0, w, h, theme:get(configuration.package.color))
+                    Diamond:DrawRoundedTexturedRect(theme:get("radius"), 0, 0, w, h, Diamond.Core.Settings.Materials.gradient, theme:lighten(configuration.package.color, 0.25))
+                end
+
+                local warning = vgui.Create("DLabel", popupHerit)
+                warning:Dock(FILL)
+                warning:SetText(`Attention! Ce rôle hérite du rôle ${v.Inherits}, si vous faites des modifications sur ce rôle, elles ne seront pas syncronisées avec le rôle en question, voulez vous les syncroniser ?`)
+                warning:SetFont(Diamond:Font(22, { weight = 500 }))
+                warning:SetTextColor(theme:get("text"))
+                warning:SetWrap(true)
+                warning:SetAutoStretchVertical(true)
+                function warning:PerformLayout(w, h)
+                    popupHerit:SetTall(h + 16 * 2 + 40 + 12)
+                end
+
+                local yes = Diamond.Components:create("Diamond:Button", popupHerit)
+                yes:Dock(BOTTOM)
+                yes:SetTall(40)
+                yes:SetTextColor(theme:get(configuration.package.color))
+                yes:setBackgroundColor(theme:get("white"))
+                yes:SetText("Syncroniser les permissions")
+                yes:setTranslationY(-4)
+            end
+
+            local lbl = vgui.Create("DLabel", scroll)
+            lbl:Dock(TOP)
+            lbl:DockMargin(0, 12, 0, 0)
+            lbl:SetText("Permissions")
+            lbl:SetFont(Diamond:Font(32, { weight = 500 }))
+            lbl:SetTextColor(theme:get("text"))
+            lbl:SetWrap(true)
+            lbl:SetAutoStretchVertical(true)
+
+            for k, v in pairs(perms or settings.default) do
+                local name = vgui.Create("DLabel", scroll)
+                name:Dock(TOP)
+                name:DockMargin(0, 6, 0, 0)
+                name:SetText(k)
+                name:SetFont(Diamond:Font(28, { weight = 500 }))
+                name:SetTextColor(theme:get("text"))
+                name:SizeToContents()
+
+                for x, y in pairs(v) do
+                    local pnl = vgui.Create("DPanel", scroll)
+                    pnl:Dock(TOP)
+                    pnl:DockMargin(0, 0, 0, 0)
+                    pnl:SetTall(62)
+                    function pnl:Paint(w, h)
+                        surface.SetDrawColor(theme:lighten("background", 0.75))
+                        surface.DrawLine(0, h - 1, w, h - 1)
+                    end
+
+                    local sub = vgui.Create("DPanel", pnl)
+                    sub:Dock(TOP)
+                    sub:DockMargin(0, 5, 0, 0)
+                    sub:SetTall(50)
+                    sub.Paint = nil
+
+                    local name = vgui.Create("DLabel", sub)
+                    name:Dock(LEFT)
+                    name:DockMargin(0, 0, 0, 0)
+                    name:SetText(x .." the " ..k)
+                    name:SetFont(Diamond:Font(22, { weight = 500 }))
+                    name:SetTextColor(theme:get("text"))
+                    name:SizeToContents()
+
+                    local toggle = Diamond.Components:create("Diamond:CheckBox", sub)
+                    toggle:Dock(RIGHT)
+                    toggle:DockMargin(8, 8, 0, 8)
+                    toggle:SetWide(60)
+
+                    local description = vgui.Create("DLabel", pnl)
+                    description:Dock(FILL)
+                    description:DockMargin(0, 0, 0, 0)
+                    description:SetText("Deserunt ipsum ad consectetur deserunt ad est consequat cupidatat aute. Cillum deserunt do occaecat do aute amet adipisicing est est commodo excepteur non. Irure excepteur nisi mollit id enim duis sunt enim deserunt Lorem aliquip.")
+                    description:SetFont(Diamond:Font(18, { weight = 500 }))
+                    description:SetTextColor(theme:lighten("text", -0.4))
+                    description:SetWrap(true)
+                    description:SetAutoStretchVertical(true)
+                    function description:PerformLayout(w, h)
+                        pnl:SetTall(50 + h + 20)
+                    end
+                end
+            end
+        end, {
+            BackgroundColor = colors[k] or colors[v.Inherits] or theme:lighten("background", 1.5)
+        })
+    end
 end)
+
+RunConsoleCommand('diamond_close_vgui')
+RunConsoleCommand('diamond_configurator', 'library')

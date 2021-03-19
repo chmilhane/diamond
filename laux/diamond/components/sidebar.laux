@@ -1,10 +1,14 @@
 -- import Lerp, LerpColor from Diamond.Animations
 local theme = Diamond.Theme
 
-Diamond.Components:register("Diamond:Sidebar", (base, ...) =>
+Diamond.Components:register("Diamond:Sidebar", (base, marginContainer) =>
+    base:accessorFunc("backgroundColor")
+    base:accessorFunc("rounded")
+
     function base:Initialize()
-        self:SetContainer(self:GetParent())
+        self:SetContainer(self:GetParent(), marginContainer)
         self:GetVBar():SetWide(0)
+        self:setRounded({ false, false, true, false })
 
         self.active = -1
 
@@ -20,7 +24,7 @@ Diamond.Components:register("Diamond:Sidebar", (base, ...) =>
     function base:SetContainer(container: Panel, margin = 12: number)
         local panel = vgui.Create("Panel", container)
         panel:Dock(FILL)
-        panel:DockMargin(margin, margin, margin, margin)
+        panel:DockMargin(math.max(margin, 4), margin, 0, margin)
 
         self.__container = panel
     end
@@ -115,6 +119,6 @@ Diamond.Components:register("Diamond:Sidebar", (base, ...) =>
     end
 
     function base:Paint(w, h)
-        draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, theme:lighten("background", -0.2), false, false, true, false)
+        draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, self:getBackgroundColor() or theme:lighten("background", -0.2), unpack(self:getRounded()))
     end
 end, "DScrollPanel")

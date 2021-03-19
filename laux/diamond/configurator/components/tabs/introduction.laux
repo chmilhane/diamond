@@ -4,17 +4,54 @@ Diamond.Components:register("Diamond:Configurator:Tabs:Introduction", (base, ...
     function base:Paint(w, h)
         stopif not self.configurator
         local package = self.configurator:getPackage()
-
+        
         Diamond:DrawDualText({
             text = package.name,
             font = Diamond:Font(ScreenScale(8))
         }, {
             text = package.description,
             font = Diamond:Font(ScreenScale(7.5))
-        }, w, h * 0.3, w / 2, h / 2, 1, 1)
+        }, w, h / 3.75, w / 2, h / 2, 1, 1)
+    end
+
+    local panel = vgui.Create("DPanel", base)
+    panel:Dock(FILL)
+    panel:DockMargin(0, base:GetParent():GetTall() / 3.8, 0, 0)
+    panel.Paint = nil
+
+    local function drawPanelChildrens()
+        local w = base:GetParent():GetWide() / 6
+        local first
+        
+        for k, v in ipairs(base.configurator.categories) do
+            local btn = Diamond.Components:create("Diamond:Button", panel)
+            btn:Dock(TOP)
+            btn:DockMargin(w, 0, w, 16)
+            btn:SetTall(55)
+            btn:SetText(v.text)
+            btn:setLabelPosition(TEXT_ALIGN_LEFT)
+            btn:setIcon({
+                icon = Diamond:FormatIcon(v.icon),
+                font = Diamond:Font(18, { font = "Font Awesome 5 Free Solid" }),
+            })
+            btn:setBackgroundColor(k == 1 and theme:get(base.configurator.package.color) or theme:lighten("background", 0.5))
+            function btn:DoClick()
+                first:setBackgroundColor(self:getBackgroundColor())
+                self:setBackgroundColor(theme:get(base.configurator.package.color))
+                base:GetParent():GetParent().navbar:SelectPanel(k, true)
+            end
+
+            if k == 1 then
+                first = btn
+            end
+        end
     end
 
     function base:SetConfigurator(index)
         self.configurator = Diamond.Configurator.Cache:get(index)
+        drawPanelChildrens()
     end
 end)
+
+RunConsoleCommand('diamond_close_vgui')
+RunConsoleCommand('diamond_configurator', 'library')

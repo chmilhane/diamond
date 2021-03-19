@@ -66,6 +66,10 @@ public class Diamond.DB
         return self
     end
 
+    find(value, key = "id")
+        return self:where(key, value):first()
+    end
+
     first()
         self:limit(1)
         local res = self:makeRequest()
