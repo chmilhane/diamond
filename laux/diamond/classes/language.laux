@@ -30,9 +30,9 @@ public class Diamond.Core.Language
 
     async download(index: string, url: string)
         local client = Diamond.HttpClient()
-        local result = await client:fetch(url)
+        local response = await client:fetch(url)
 
-        local content = util.JSONToTable(result.content) ?? {}
+        local content = util.JSONToTable(response:getContent()?.body) ?? {}
         self:add(index, content)
 
         return result
