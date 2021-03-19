@@ -1,18 +1,14 @@
 public class Diamond.Downloader
     _get directory
 
-    constructor(directory)
+    constructor(directory = "diamond/files": string)
         self.cache = {}
-
-        if directory then
-            self:setDirectory(directory)
-        end
+        self:setDirectory(directory)
     end
 
-    checkDirectory(directory: string)
+    --[[ private ]] checkDirectory(directory: string)
 		if string.EndsWith(directory, "/") then
-			local len = #directory
-			directory = string.sub(directory, len - 1, len)
+			directory = string.sub(directory, #directory - 1, #directory)
 		end
 
         return directory
@@ -22,10 +18,8 @@ public class Diamond.Downloader
         self.directory = self:checkDirectory(directory)
     end
 
-    downloadOne(params: table)
-        local p = Diamond.Promises.new()
-
-        params.directory = params.directory and self:checkDirectory(string.Replace(params.directory, "%BASE%", self:getDirectory())) or self:getDirectory()
+    async downloadOne(params: table)
+        params.directory = params.directory and self:checkDirectory(string.Replace(params.directory, "{{ BASE }}", self:getDirectory())) or self:getDirectory()
         params.extension = params.extension or "png"
         params.url = params.url or params.index and "https://i.imgur.com/" .. params.index .. "." .. params.extension
         params.filename = params.filename or util.CRC(params.url)
@@ -35,30 +29,30 @@ public class Diamond.Downloader
 
         self.cache[params.url] = params
 
-        http.Fetch(params.url, (body) =>
-            file.CreateDir(params.directory)
-            file.Write(path, body)
+        local client = Diamond.HttpClient()
+        local response = await client:fetch({
+            url = params?.url
+        })
 
-            params.content = body
+        file.CreateDir(params?.directory)
+        file.Write(path, response:getContent()?.body)
 
-            return p:resolve(params)
-        end, (err) => p:reject(err) end)
-
-        return p
+        return {
+            params = params,
+            response = response,
+        }
     end
 
     download(content: table)
-        local p = Diamond.Promises.new()
-        local i = 1
-
         local res = {}
+        local i = 1
 
         local function stack(index, callback)
             local params = content[index]
             stopif not params
 
-            self:downloadOne(params):next((params) =>
-                res[index] = params
+            self:downloadOne(params):next((request) =>
+                res[index] = request?.params
 
                 if callback then
                     callback(index)
@@ -66,7 +60,7 @@ public class Diamond.Downloader
 
                 i++
                 stack(i, callback)
-            end, (err) => res[index] = { error = err } end)
+            end, (e) => res[index] = { error = e } end)
         end
 
         stack(i, (index) =>
@@ -74,8 +68,6 @@ public class Diamond.Downloader
                 p:resolve(res)
             end
         end)
-
-        return p
     end
 
     get(url: string)
@@ -103,28 +95,32 @@ end
     local async function test()
         local downloader = Diamond.Downloader("diamond/files")
 
-        local params = await downloader:download({
-            {
-                index = "I6no46e",
-            },
-
-            {
-                directory = "%BASE%/json",
-                url = "https://api.datamuse.com/words?sl=baguette",
-                extension = "json"
-            },
-
-            {
-                url = "https://www.dropbox.com/s/wcphnfttyn1g37e/hackerman.mp3?dl=1",
-                extension = "mp3"
-            },
-
-            {
-                url = "https://media.discordapp.net/attachments/721524785468932106/797735107338174464/5469a67.png",
-            }
+        local request = await downloader:downloadOne({
+            index = "I6no46e"
         })
 
-        PrintTable(params)
+        -- local params = await downloader:download({
+        --     {
+        --         index = "I6no46e",
+        --     },
+
+        --     -- {
+        --     --     directory = "%BASE%/json",
+        --     --     url = "https://api.datamuse.com/words?sl=baguette",
+        --     --     extension = "json"
+        --     -- },
+
+        --     -- {
+        --     --     url = "https://www.dropbox.com/s/wcphnfttyn1g37e/hackerman.mp3?dl=1",
+        --     --     extension = "mp3"
+        --     -- },
+
+        --     -- {
+        --     --     url = "https://media.discordapp.net/attachments/721524785468932106/797735107338174464/5469a67.png",
+        --     -- }
+        -- })
+
+        PrintTable(request)
     end
     test()
 ]]
