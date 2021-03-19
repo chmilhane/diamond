@@ -4,8 +4,7 @@ local __blacklistedPanels = {
     ["SpawnMenu"] = true,
     ["ContextMenu"] = true,
     ["ControlMenu"] = true,
-    ["CGMODMouseInput"] = true,
-    ["Panel"] = true
+    ["CGMODMouseInput"] = true
 }
 
 local __blacklistedScripts = {
