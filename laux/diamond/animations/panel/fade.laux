@@ -12,15 +12,15 @@ function PANEL:fadeIn(duration, callback, easeFunction)
 			fraction = easeFunction(fraction)        
 		end
 
-        local alpha = Lerp(fraction, panel:GetAlpha(), 255)
-        panel:SetAlpha(alpha)
+		local alpha = Lerp(fraction, panel:GetAlpha(), 255)
+		panel:SetAlpha(alpha)
     end
 
-    function anim:OnEnd(panel)
+	function anim:OnEnd(panel)
 		if callback and isfunction(callback) then
 			callback(self, panel)
 		end
-    end
+	end
 end
 
 function PANEL:fadeOut(duration, callback, easeFunction)
@@ -38,11 +38,11 @@ function PANEL:fadeOut(duration, callback, easeFunction)
         panel:SetAlpha(alpha)
     end
 
-    function anim:OnEnd(panel)
+	function anim:OnEnd(panel)
 		if callback and isfunction(callback) then
 			callback(self, panel)
-        else
-            panel:Remove()
+		else
+			panel:Remove()
 		end
-    end
+	end
 end
