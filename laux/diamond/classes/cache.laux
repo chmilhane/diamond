@@ -1,38 +1,30 @@
-local __cache = {}
-
 public class Diamond.Cache
-    constructor(name: string)
-        self.name = name
-        __cache[self.name] ??= {}
+    constructor()
+        self.cache = {}
+
+        self.exists = self.has
+        self.store = self.set
     end
 
-    has(key)
-        return __cache[self.name][key] and true or false
+    has(index)
+        return self.cache?[index] and true or false
     end
 
-    get(key)
-        if (not key) then
-            return __cache[self.name]
+    get(index)
+        if not index then
+            return self.cache
         end
 
-        return __cache[self.name][key]
+        return self.cache?[index] 
     end
 
-    store(key, value)
-        __cache[self.name][key] = value
+    set(index, value)
+        self.cache[index] = value
         return self
     end
 
-    update(key, value)
-        __cache[self.name][key] = value
-        return self
-    end
-
-    delete(key)
-        __cache[self.name][key] = nil
+    delete(index)
+        self.cache[index] = nil
         return self
     end
 end
-
--- local cache = Diamond.Cache("test")
--- cache:store("hello", "world")

@@ -40,7 +40,7 @@ local d1 = 2.75
     cache methods
 ]]
 
-local cache = Diamond.Cache("Easing")
+local cache = Diamond.Cache()
 
 cache:store("linear", (x) =>
     return x

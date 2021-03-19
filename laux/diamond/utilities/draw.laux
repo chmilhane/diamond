@@ -27,15 +27,17 @@ function Diamond:MaskStencil(mask, rendering, invert = false: boolean)
     render.ClearStencil()
 end
 
-local cache = Diamond.Cache("Circles")
+local _cache = {}
 function Diamond:DrawCircle(x = 0: number, y = 0: number, radius = 0: number, color, angleStart = 0: number, angleEnd = 360: number, shouldDraw = false: boolean)
-    local cachePath = x ..y ..radius ..angleStart ..angleEnd
-    if shouldDraw and cache:has(cachePath) then
-        local poly = cache:get(cachePath)
+    local cachePath = x .. y .. radius .. angleStart .. angleEnd
+    if shouldDraw and _cache[cachePath] then
+        local poly = _cache[cachePath]
+        stopif not poly
 
         draw.NoTexture()
         surface.SetDrawColor(color)
         surface.DrawPoly(poly)
+
         return
     end
 
@@ -52,7 +54,8 @@ function Diamond:DrawCircle(x = 0: number, y = 0: number, radius = 0: number, co
     poly[#poly + 1] = { x = x, y = y }
 
     if shouldDraw then
-        cache:store(cachePath, poly)
+        _cache[cachePath] = poly
+
         draw.NoTexture()
         surface.SetDrawColor(color)
         surface.DrawPoly(poly)
