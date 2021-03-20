@@ -122,6 +122,18 @@ function deferred:reject(value)
 	return resolve(self, REJECTING, value)
 end
 
+function deferred:progress(value)
+	self.progress = math.Clamp(self.progress + value, 0, 100)
+
+	if self.onProgressChanged then
+		self:onProgressChanged(self.progress)
+	end
+end
+
+function deferred:onProgressChanged(value)
+	--> print(value)
+end
+
 --- Returns a new promise object.
 --- @treturn Promise New promise
 --- @usage
@@ -180,6 +192,7 @@ function M.new(options)
 			end
 			return next
 		end,
+		progress = 0,
 		state = 0,
 		queue = {},
 		success = options.success,
