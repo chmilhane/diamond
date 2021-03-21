@@ -8,8 +8,6 @@ public class Diamond.Component
         self:setParent(parent)
         self:setBase(base)
 
-        Diamond:log(overwrittenProps)
-
         for i, v in pairs(overwrittenProps) do
             if istable(props[i]) then
                 props[i].value = v
@@ -21,7 +19,7 @@ public class Diamond.Component
         self.props = props
     end
 
-    static accessorFunc(this, panel: Panel|table, variable: string, force, methods)
+    static accessorFunc(this, panel: Panel|table|Entity, variable: string, force, methods)
         local name = variable:gsub("^%l", string.upper)
         local forces = {
             [FORCE_STRING] = () -> return tostring(self) end,
@@ -43,7 +41,11 @@ public class Diamond.Component
 
         if methods["set"] then
             panel["set" .. name] = (value) ->
-                panel[variable] = forces?[force] or value
+                if istable(panel[variable]) then
+                    panel[variable].value = forces?[force] or value
+                else
+                    panel[variable] = forces?[force] or value
+                end
 
                 if self.onPropsChanged and isfunction(self.onPropsChanged) then
                     self:onPropsChanged(variable, value, self.props ?? {})
