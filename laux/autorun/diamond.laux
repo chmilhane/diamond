@@ -55,7 +55,7 @@ do
 		loader:addFile("animations/easing/core", DIAMOND_SHARED)
 		loader:addDirectory("core", DIAMOND_SHARED, {
 			realms = {
-				["components"] = DIAMOND_CLIENT
+				["examples"] = DIAMOND_CLIENT
 			}
 		})
 		loader:addDirectory("classes", DIAMOND_SHARED, {
@@ -66,6 +66,9 @@ do
 			},
 			foldersToIgnore = {
 				["database"] = true
+			},
+			realms = {
+				["components"] = DIAMOND_CLIENT
 			}
 		})
 		loader:addDirectory("libraries", DIAMOND_SHARED, {
@@ -78,6 +81,7 @@ do
 				["miscellaneous"] = DIAMOND_CLIENT
 			}
 		})
+		loader:addDirectory("utilities/entities", DIAMOND_SHARED)
 		loader:addDirectory("animations", DIAMOND_SHARED, {
 			recursive = false
 		})
@@ -91,5 +95,6 @@ do
 		loader:addDirectory("configurator/components", DIAMOND_CLIENT, {
 			recursive = true
 		})
+		loader:addFile("examples/downloader", DIAMOND_CLIENT)
 	loader:finish()
 end

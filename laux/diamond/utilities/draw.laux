@@ -132,13 +132,13 @@ end
 
 function Diamond:DrawRainbowText(font: string, x = 0: number, y = 0: number, xAlign = 0, yAlign = 1: number, ...)
     -- TODO
-    local _markup = "<font=" .. font .. ">"
+    -- local _markup = "<font=" .. font .. ">"
 
-    for i, v in ipairs({...}) do
-        _markup ..= IsColor(v) and "<color" or tostring(v)
-    end
+    -- for i, v in ipairs({...}) do
+    --     _markup ..= IsColor(v) and "<color" or tostring(v)
+    -- end
 
-    _markup ..= "</font>"
+    -- _markup ..= "</font>"
 
     -- surface.SetFont(font)
 
@@ -188,5 +188,41 @@ function Diamond:DrawBlur(panel, amount)
         blur:Recompute()
         render.UpdateScreenEffectTexture()
         surface.DrawTexturedRect(x * -1, y * -1, scrW, scrH)
+    end
+end
+
+function Diamond:DrawBlurPos(x, y, w, h, amount)
+	local _x, _y = 0,0
+
+	surface.SetDrawColor(255, 255, 255)
+	surface.SetMaterial(blur)
+
+	for i = 1, amount or 5 do
+		blur:SetFloat("$blur", (i / 3) * (5))
+		blur:Recompute()
+
+		render.UpdateScreenEffectTexture()
+
+		render.SetScissorRect(x, y, x + w, y + h, true)
+			surface.DrawTexturedRect(_x * -1, _y * -1, ScrW(), ScrH())
+		render.SetScissorRect(0, 0, 0, 0, false)
+	end
+end
+
+function Diamond:DrawEntity(content: table)
+    surface.SetFont(content.font)
+    local width = surface.GetTextSize(content.title)
+    local height = draw.GetFontHeight(content.font)
+
+    width += content.icon and 48 * 1.4 or 48
+    height += 48 / 2
+
+    local cx, cy = -width / 2, -height / 2
+
+    draw.RoundedBox(theme:get("radius") / 2, cx, cy, width, height, theme:get("background"))
+    draw.SimpleText(content.title, content.font, content.icon and 18.5 or 0, -1, theme:get("text"), 1, 1)
+
+    if content.icon then
+        Diamond:DrawIcon(content.icon, content.iconStyle or "Solid", draw.GetFontHeight(content.font) - 8, (-width / 2) + 28, 2, 1, 1, theme:get("text"))
     end
 end
