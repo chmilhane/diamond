@@ -47,6 +47,8 @@ public class Diamond.Downloader
         local res = {}
         local i = 1
 
+        local p = Diamond.Promises.new()
+
         local function stack(index, callback)
             local params = content[index]
             stopif not params
@@ -64,10 +66,14 @@ public class Diamond.Downloader
         end
 
         stack(i, (index) =>
+            p:progress(100 / #content, content[i])
+
             if index == #content then
                 p:resolve(res)
             end
         end)
+
+        return p
     end
 
     get(url: string)
