@@ -1,0 +1,55 @@
+local theme = Diamond.Theme
+
+public class Diamond.Components.Container extends Diamond.Component
+	constructor(parent, props)
+		super(parent, "Panel", {
+			title = {
+				value = "Category",
+				force = FORCE_STRING,
+                methods = {
+                    ["get"] = true
+                }
+			},
+            panel = {
+                value = "DPanel",
+                force = FORCE_STRING
+            }
+		}, props)
+	end
+
+	render(component)
+        function component:initialize(props)
+            self:DockPadding(16, 16, 16, 16)
+
+            self.label = vgui.Create("DLabel", self)
+            self.label:Dock(TOP)
+            self.label:DockMargin(0, 0, 0, 16)
+            self.label:SetFont(Diamond:Font(18))
+            self.label:SetText(self:getTitle())
+            self.label:SetTextColor(theme:get("text"))
+
+            self.container = vgui.Create(self:getPanel(), self)
+            self.container:Dock(FILL)
+            self.container.Paint = (this, w, h) =>
+                draw.RoundedBox(theme:get("radius"), 0, 0, w, h, theme:get("background"))
+            end
+        end
+
+        function component:getContainer()
+            return self.container
+        end
+
+        function component:setTitle(title: string)
+            self.props.title = title
+
+            self.label:SetText(title)
+            self.label:SizeToContents()
+        end
+
+        function component:Paint(w, h)
+            draw.RoundedBox(theme:get("radius"), 0, 0, w, h, theme:lighten("background", 0.25))
+        end
+
+		return component
+	end
+end
