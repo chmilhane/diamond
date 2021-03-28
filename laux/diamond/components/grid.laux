@@ -1,69 +1,82 @@
--- Source --> https://github.com/Threebow/better-derma-grid/blob/master/threegrid.lua
-Diamond.Components:register("Diamond:Grid", (base, ...) =>
-	base:accessorFunc("horizontalMargin", FORCE_NUMBER)
-	base:accessorFunc("verticalMargin", FORCE_NUMBER)
-	base:accessorFunc("columns", FORCE_NUMBER)
+--> https://github.com/Threebow/better-derma-grid/blob/master/threegrid.lua
+public class Diamond.Components.Grid extends Diamond.Component
+    constructor(parent, props)
+        super(parent, "DScrollPanel", {
+            horizontalMargin = {
+                value = 0,
+                force = FORCE_NUMBER
+            },
+            verticalMargin = {
+                value = 0,
+                force = FORCE_NUMBER
+            },
+            columns = {
+                value = 3,
+                force = FORCE_NUMBER
+            }
+        }, props)
+    end
 
-	function base:Initialize()
-		self:setHorizontalMargin(0)
-		self:setVerticalMargin(0)
+    render(component)
+        function component:initialize(props)
+            self.rows = {}
+            self.cells = {}
+        end
 
-		self.Rows = {}
-		self.Cells = {}
-	end
+        function component:addCell(panel: Panel)
+            local index = math.floor(#self.cells / self:getColumns()) + 1
+            self.rows[index] = self.rows[index] or self:createRow()
 
-	function base:AddCell(pnl)
-		local cols = self:getColumns()
-		local idx = math.floor(#self.Cells/cols)+1
-		self.Rows[idx] = self.Rows[idx] || self:CreateRow()
+            local margin = self:getHorizontalMargin()
+            panel:SetParent(self.rows[index])
+            panel:Dock(LEFT)
+            panel:DockMargin(0, 0, #self.rows[index].items + 1 < self:getColumns() and self:getHorizontalMargin() or 0, 0)
+            panel:SetWide((self:GetWide() - margin * (self:getColumns() - 1)) / self:getColumns())
 
-		local margin = self:getHorizontalMargin()
-		
-		pnl:SetParent(self.Rows[idx])
-		pnl:Dock(LEFT)
-		pnl:DockMargin(0, 0, #self.Rows[idx].Items+1 < cols && self:getHorizontalMargin() || 0, 0)
-		pnl:SetWide((self:GetWide()-margin*(cols-1))/cols)
+            self.rows[index].items[#self.rows[index].items + 1] = panel
+            self.cells[#self.cells + 1] = panel
 
-		table.insert(self.Rows[idx].Items, pnl)
-		table.insert(self.Cells, pnl)
-		self:CalculateRowHeight(self.Rows[idx])
-	end
+            self:calculateRowHeight(self.rows[index])
+        end
 
-	function base:CreateRow()
-		local row = self:Add("DPanel")
-		row:Dock(TOP)
-		row:DockMargin(0, 0, 0, self:getVerticalMargin())
-		row.Paint = nil
-		row.Items = {}
-		return row
-	end
+        function component:createRow()
+            local row = self:Add("Panel")
+            row:Dock(TOP)
+            row:DockMargin(0, 0, 0, self:getVerticalMargin())
+            row.items = {}
 
-	function base:CalculateRowHeight(row)
-		local height = 0
+            return row
+        end
 
-		for k, v in pairs(row.Items) do
-			height = math.max(height, v:GetTall())
-		end
+        function component:calculateRowHeight(row)
+            local height = 0
 
-		row:SetTall(height)
-	end
+            for i, v of row.items do
+                height = math.max(height, v:GetTall())
+            end
 
-	function base:Skip()
-		local cell = vgui.Create("DPanel")
-		cell.Paint = nil
-		self:AddCell(cell)
-	end
+            row:SetTall(height)
+        end
 
-	function base:Clear()
-		for _, row in pairs(self.Rows) do
-			for _, cell in pairs(row.Items) do
-				cell:Remove()
-			end
-			row:Remove()
-		end
+        function component:skip()
+            local cell = self:Add("Panel")
+            self:addCell(cell)
+        end
 
-		self.Cells, self.Rows = {}, {}
-	end
+        function component:clear()
+            for _, row of self.rows do
+                for _, cell of row.items do
+                    cell:Remove()
+                end
 
-	base.OnRemove = base.Clear
-end, "DScrollPanel")
+                row:Remove()
+            end
+
+            self.cells, self.rows = {}, {}
+        end
+
+        component.onRemove = component.clear
+
+        return component
+    end
+end
