@@ -48,7 +48,7 @@ do
 		loader:addDirectory("classes/database", DIAMOND_SERVER, {
 			recursive = true,
 		})
-		loader:addFile("classes/utilities/cache", DIAMOND_SHARED)
+		loader:addFile("classes/cache", DIAMOND_SHARED)
 		loader:addFile("animations/easing/core", DIAMOND_SHARED)
 		loader:addDirectory("core", DIAMOND_SHARED, {
 			realms = {
