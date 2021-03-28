@@ -1,0 +1,7 @@
+function Diamond:Map(tbl: table, action)
+    for i, v of tbl do
+        tbl[i] = action(v, i)
+    end
+
+    return tbl
+end

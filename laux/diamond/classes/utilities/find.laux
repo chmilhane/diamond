@@ -1,0 +1,11 @@
+function Diamond:Find(tbl: table, action)
+    local result = {}
+
+    for i, v of tbl do
+        if action(v, i) then
+            result[#result + 1] = v
+        end
+    end
+
+    return result
+end
