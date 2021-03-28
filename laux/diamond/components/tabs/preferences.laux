@@ -1,59 +1,59 @@
-local theme, lang = Diamond.Theme, Diamond.Language
+-- local theme, lang = Diamond.Theme, Diamond.Language
 
-Diamond.Components:register("Diamond:Tabs:Preferences", (base, ...) =>
-    local margin = 12
+-- Diamond.Components:register("Diamond:Tabs:Preferences", (base, ...) =>
+--     local margin = 12
 
-    function base:Initialize()
-        self.scroll = vgui.Create("DScrollPanel", self)
-        self.scroll:Dock(FILL)
-        self.scroll:DockMargin(margin, margin, margin, margin)
+--     function base:Initialize()
+--         self.scroll = vgui.Create("DScrollPanel", self)
+--         self.scroll:Dock(FILL)
+--         self.scroll:DockMargin(margin, margin, margin, margin)
 
-        local prefMode, prefColor = theme:getCurrentTheme(), theme:getCurrentColor()
-        for i, v of theme:list() do
-            local label = vgui.Create("DLabel", self.scroll)
-            label:Dock(TOP)
-            label:DockMargin(0, 0, 0, margin / 2)
-            label:SetText(lang:get("core.components.theme." .. i))
-            label:SetFont(Diamond:Font(24))
-            label:SetTextColor(theme:get("text"))
-            label:SizeToContentsY()
+--         local prefMode, prefColor = theme:getCurrentTheme(), theme:getCurrentColor()
+--         for i, v of theme:list() do
+--             local label = vgui.Create("DLabel", self.scroll)
+--             label:Dock(TOP)
+--             label:DockMargin(0, 0, 0, margin / 2)
+--             label:SetText(lang:get("core.components.theme." .. i))
+--             label:SetFont(Diamond:Font(24))
+--             label:SetTextColor(theme:get("text"))
+--             label:SizeToContentsY()
 
-            Diamond:on("themeChanged", (oldTheme, newTheme) =>
-                stopif not label or not IsValid(label)
-                label:SetTextColor(theme:get("text"))
-            end)
+--             Diamond:on("themeChanged", (oldTheme, newTheme) =>
+--                 stopif not label or not IsValid(label)
+--                 label:SetTextColor(theme:get("text"))
+--             end)
 
-            local icon = vgui.Create("DIconLayout", self.scroll)
-            icon:Dock(TOP)
-            icon:DockMargin(0, 0, 0, margin)
-            icon:SetSpaceX(margin)
-            icon:SetSpaceY(margin)
+--             local icon = vgui.Create("DIconLayout", self.scroll)
+--             icon:Dock(TOP)
+--             icon:DockMargin(0, 0, 0, margin)
+--             icon:SetSpaceX(margin)
+--             icon:SetSpaceY(margin)
 
-            for x, color of v do
-                continueif x == "black" or x == "white"
+--             for x, color of v do
+--                 continueif x == "black" or x == "white"
 
-                local btn = vgui.Create("DPanel", icon)
-                btn:SetSize(42, 42)
-                btn:SetCursor("hand")
+--                 local btn = vgui.Create("DPanel", icon)
+--                 btn:SetSize(42, 42)
+--                 btn:SetCursor("hand")
 
-                function btn:Paint(w, h)
-                    local m = 4
-                    local r = h / 2 or 4
-                    draw.RoundedBox(r, 0, 0, w, h, theme:lighten("background", 5))
-                    draw.RoundedBox(r, m / 2, m / 2, w - m, h - m, istable(color) and color.background or color)
+--                 function btn:Paint(w, h)
+--                     local m = 4
+--                     local r = h / 2 or 4
+--                     draw.RoundedBox(r, 0, 0, w, h, theme:lighten("background", 5))
+--                     draw.RoundedBox(r, m / 2, m / 2, w - m, h - m, istable(color) and color.background or color)
 
-                    if prefMode == x or prefColor == x then
-                        draw.SimpleText(utf8.char(0xf00c), Diamond:Font(22, { font = "Font Awesome 5 Free Solid" }), w / 2 , h / 2, theme:get((prefMode == "light" and x == "light") and "black" or "white"), 1, 1)
-                    end
-                end
+--                     if prefMode == x or prefColor == x then
+--                         draw.SimpleText(utf8.char(0xf00c), Diamond:Font(22, { font = "Font Awesome 5 Free Solid" }), w / 2 , h / 2, theme:get((prefMode == "light" and x == "light") and "black" or "white"), 1, 1)
+--                     end
+--                 end
 
-                function btn:OnMousePressed()
-                    theme:setCurrentTheme(x)
-                    theme:setCurrentColor(x)
+--                 function btn:OnMousePressed()
+--                     theme:setCurrentTheme(x)
+--                     theme:setCurrentColor(x)
 
-                    prefMode, prefColor = theme:getCurrentTheme(), theme:getCurrentColor()
-                end
-            end
-        end
-    end
-end)
+--                     prefMode, prefColor = theme:getCurrentTheme(), theme:getCurrentColor()
+--                 end
+--             end
+--         end
+--     end
+-- end)
