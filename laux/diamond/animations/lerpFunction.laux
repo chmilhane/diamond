@@ -1,0 +1,18 @@
+public class Diamond.Animations.LerpFunction extends Diamond.AnimationBase
+	constructor(func, from, goal: number, ...)
+		super(...)
+
+		self.animData = {
+			func = func,
+            from = from,
+			goal = goal
+		}
+	end
+
+	onThink(anim, panel, fraction)
+		local { func, from, goal } = self.animData
+
+		local value = Lerp(fraction, from(panel), goal)
+		func(panel, value)
+	end
+end

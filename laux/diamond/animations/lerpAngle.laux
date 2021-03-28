@@ -1,17 +1,17 @@
 public class Diamond.Animations.LerpAngle extends Diamond.AnimationBase
-  constructor(index: string|number, goal: number, ...)
-    super(...)
+	constructor(index: string|number, goal: number, ...)
+		super(...)
 
-    self.animData = {
-      index = index,
-      goal = goal
-    }
-  end
+		self.animData = {
+			index = index,
+			goal = goal
+		}
+	end
 
-  onThink(anim, panel, fraction)
-    local { index, goal } = self.animData
+	onThink(anim, panel, fraction)
+		local { index, goal } = self.animData
 
-    local value = panel[index] ?? Angle()
-    panel[index] = LerpAngle(fraction, value, goal)
-  end
+		local value = panel[index] ?? Angle()
+		panel[index] = LerpAngle(fraction, value, goal)
+	end
 end

@@ -1,53 +1,53 @@
 public class Diamond.Animations.LerpSize extends Diamond.AnimationBase
-  constructor(w: number, h: number, ...)
-    super(...)
+	constructor(w: number, h: number, ...)
+		super(...)
 
-    self.animData = {
-      goal = Vector(w, h)
-    }
-  end
+		self.animData = {
+			goal = Vector(w, h)
+		}
+	end
 
-  onThink(anim, panel, fraction)
-    local { goal } = self.animData
+	onThink(anim, panel, fraction)
+		local { goal } = self.animData
 
-    local value = Vector(panel:GetWide(), panel:GetTall())
-    local vector = LerpVector(fraction, value, goal)
-    panel:SetSize(vector.x, vector.y)
-  end
+		local value = Vector(panel:GetWide(), panel:GetTall())
+		local vector = LerpVector(fraction, value, goal)
+		panel:SetSize(vector.x, vector.y)
+	end
 end
 
 public class Diamond.Animations.LerpW extends Diamond.AnimationBase
-  constructor(w: number, ...)
-    super(...)
+	constructor(w: number, ...)
+		super(...)
 
-    self.animData = {
-      goal = w
-    }
-  end
+		self.animData = {
+			goal = w
+		}
+	end
 
-  onThink(anim, panel, fraction)
-    local { goal } = self.animData
+	onThink(anim, panel, fraction)
+		local { goal } = self.animData
 
-    local value = panel:GetWide()
-    local width = Lerp(fraction, value, goal)
-    panel:SetWide(width)
-  end
+		local value = panel:GetWide()
+		local width = Lerp(fraction, value, goal)
+		panel:SetWide(width)
+	end
 end
 
 public class Diamond.Animations.LerpH extends Diamond.AnimationBase
-  constructor(h: number, ...)
-    super(...)
+	constructor(h: number, ...)
+		super(...)
 
-    self.animData = {
-      goal = h
-    }
-  end
+		self.animData = {
+			goal = h
+		}
+	end
 
-  onThink(anim, panel, fraction)
-    local { goal } = self.animData
+	onThink(anim, panel, fraction)
+		local { goal } = self.animData
 
-    local value = panel:GetTall()
-    local height = Lerp(fraction, value, goal)
-    panel:SetTall(height)
-  end
+		local value = panel:GetTall()
+		local height = Lerp(fraction, value, goal)
+		panel:SetTall(height)
+	end
 end
