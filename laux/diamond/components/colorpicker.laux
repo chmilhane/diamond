@@ -1,0 +1,284 @@
+local theme = Diamond.Theme
+
+local DEFAULT = 0
+local LINEAR_GRADIENT = 1
+
+local textures = {
+    [DEFAULT] = (x, y, w, h, color, radius) ->
+        local fract = self:getSaturation() * 2
+        local newColor = Color(
+            color.r + color.r * fract,
+            color.g + color.g * fract,
+            color.b + color.b * fract
+        )
+
+        Diamond:DrawRoundedRect(radius or self:getRadius(), x or 0, y or 0, w, h, newColor)
+    end,
+
+    [LINEAR_GRADIENT] = (x, y, w, h, color, radius) ->
+        local fract = 0.5 + self:getSaturation() * 3
+        local newColor = Color(
+            color.r + color.r * fract,
+            color.g + color.g * fract,
+            color.b + color.b * fract
+        )
+
+        Diamond:DrawRoundedTexturedRect(radius or self:getRadius() - 1, x or 0, y or 0, w, h, Diamond.Core.Settings.Materials["gradient"], newColor)
+    end
+}
+
+local function label(text, font, parent, margin = true: boolean)
+    local l = parent:Add("DLabel")
+    l:Dock(TOP)
+    l:DockMargin(0, margin and 16 or 0, 0, 6)
+    l:SetText(text)
+    l:SetFont(font)
+    l:SetTextColor(theme:get("text"))
+    l:SizeToContents()
+end
+
+class ColorManager
+    static rgbToHex(color: table)
+        return string.format("#%02x%02x%02x", color.r, color.g, color.b)
+    end
+
+    static hexToRgb(color: string)
+        color = color:gsub("#", "")
+
+        if #color == 3 then
+            local r = color:sub(1, 1)
+            local g = color:sub(2, 2)
+            local b = color:sub(3, 3)
+
+            return Color(
+                tonumber("0x" .. r .. r), 
+                tonumber("0x" .. g .. g), 
+                tonumber("0x" .. b .. b)
+            )
+        end
+
+        return Color(
+            tonumber("0x" .. color:sub(1, 2)), 
+            tonumber("0x" .. color:sub(3, 4)), 
+            tonumber("0x" .. color:sub(5, 6))
+        )
+    end
+end
+
+class Picker extends Diamond.Component
+    constructor(parent, props)
+        super(parent, "Panel", {
+            color = {
+                value = theme:get("preference"),
+                -- methods = {
+                --     ["get"] = true
+                -- }
+            },
+            material = { value = Material("diamond/colors.png", "smooth") }
+        }, props)
+    end
+
+    render(component)
+        function component:initialize(props)
+            self.barX = 0
+        end
+
+        function component:Paint(w, h)
+            local radius = 4
+            Diamond:DrawRoundedTexturedRect(radius, 0, 0, w, h, self:getMaterial(), color_white)
+
+            Diamond:MaskStencil(() =>
+                Diamond:DrawRoundedRect(radius, 0, 0, w, h, color_white)
+            end, () =>
+                surface.SetDrawColor(color_white)
+                surface.DrawRect(self.barX, 0, 2, h)
+            end)
+        end
+
+        function component:OnCursorMoved(x, y)
+            -- stopif not self:IsHovered()
+            stopif not input.IsMouseDown(MOUSE_LEFT)
+
+            local color = self:getPosColor(x, y)
+            if color then
+                self:setColor(color)
+                self:OnChange(color)
+            end
+
+            -- Diamond.Animations.Lerp("barX", math.Clamp(x, 0, self:GetWide() - 2), self, 0.2)
+            self.barX = math.Clamp(x, 0, self:GetWide() - 2)
+        end
+
+        function component:OnChange(color)
+
+        end
+
+        function component:OnMousePressed(code)
+            self:MouseCapture(true)
+            self:OnCursorMoved(self:CursorPos())
+        end
+
+        function component:OnMouseReleased(code)
+            self:MouseCapture(false)
+            self:OnCursorMoved(self:CursorPos())
+        end
+
+        function component:getPosColor(x, y)
+            local mat = self:getMaterial()
+
+            local w = (x / self:GetWide()) * mat:Width()
+            local h = (y / self:GetTall()) * mat:Height()
+
+            w = math.Clamp(w, 0, mat:Width() - 1)
+            h = math.Clamp(h, 0, mat:Height() - 1)
+
+            return mat:GetColor(w, h), w, h
+        end
+
+        -- function component:setColor(color)
+        --     local mat = self:getMaterial()
+        --     print(mat:GetMatrix(mat:GetName()))
+        -- end
+
+        return component
+    end
+end
+
+public class Diamond.Components.ColorPicker extends Diamond.Component
+    constructor(parent, props)
+        super(parent, "EditablePanel", {
+            texture = {
+                value = LINEAR_GRADIENT,
+                force = FORCE_NUMBER
+            },
+            radius = {
+                value = 24,
+                force = FORCE_NUMBER
+            },
+            saturation = {
+                value = 0,
+                force = FORCE_NUMBER
+            },
+            color = { value = Color(255, 0, 0) }
+        }, props)
+    end
+
+    render(component)
+        function component:initialize(props)
+            self.categoryFont = Diamond:Font(20)
+
+            self.clipboard = self:Add("DButton")
+            self.clipboard:SetText("")
+            self.clipboard.active = false
+            self.clipboard.DoClick = (this) =>
+                SetClipboardText(self:getFormattedColor())
+            end
+            self.clipboard.Paint = (this, w, h) =>
+                this.color = theme:lerp(
+                    FrameTime() * 8,
+                    this.color or theme:get("text"),
+                    this:IsDown() and theme:get("text") or this:IsHovered() and theme:lighten("text", -0.2) or theme:get("text")
+                )
+
+                draw.RoundedBox(h / 2, 0, 0, w, h, Color(0, 0, 0, 125))
+                Diamond:DrawIcon("f24d", "Regular", h / 2, w / 2, h / 2, 1, 1, theme:alpha(this.color, 200))
+            end
+
+            self.editor = self:Add("Panel")
+            self.editor:Dock(BOTTOM)
+            self.editor:DockPadding(32, 32, 32, 32)
+            self.editor.Paint = (this, w, h) =>
+                Diamond:DrawRoundedRect(self:getRadius(), 0, 0, w, h, theme:lighten("background", 0.25))
+            end
+
+            label("Color", self.categoryFont, self.editor, false)
+
+            self.picker = Picker(self.editor):create()
+            self.picker:Dock(TOP)
+            self.picker:SetTall(16)
+
+            label("Saturation", self.categoryFont, self.editor)
+
+            self.saturation = Diamond.Components.Slider(self.editor):create()
+            self.saturation:Dock(TOP)
+            self.saturation:Center()
+            self.saturation:setColor(self:getColor())
+
+            local panel = self.editor:Add("Panel")
+            panel:Dock(BOTTOM)
+            panel:DockMargin(16, 0, 16, 0)
+
+            local textentry = panel:Add("DTextEntry")
+            textentry:Dock(FILL)
+
+            local combobox = panel:Add("DComboBox")
+            combobox:Dock(LEFT)
+            combobox:AddChoice("Color", () =>
+                local color = self:getFormattedColor()
+
+                return color
+            end)
+            combobox:AddChoice("Hex", () =>
+                local _, color = self:getFormattedColor()
+                local hex = ColorManager.rgbToHex(color)
+
+                return "#" .. hex
+            end)
+            combobox:ChooseOptionID(1)
+            combobox.OnSelect = (this, index, value, data) =>
+                textentry:SetValue((data and isfunction(data)) and data() or "")
+            end
+
+            self.picker.OnChange = (this, color) =>
+                self:setColor(color)
+                self.saturation:setColor(color)
+
+                local value, data = combobox:GetSelected()
+                textentry:SetValue((data and isfunction(data)) and data() or "")
+            end
+
+            self.saturation.onValueChanged = (this, fraction) =>
+                self:setSaturation(fraction)
+
+                local value, data = combobox:GetSelected()
+                textentry:SetValue((data and isfunction(data)) and data() or "")
+            end
+        end
+
+        function component:getFormattedColor()
+            local fract = self:getSaturation() * 2
+            local color = self:getColor()
+
+            local newColor = Color(
+                math.floor(color.r + color.r * fract),
+                math.floor(color.g + color.g * fract),
+                math.floor(color.b + color.b * fract)
+            )
+
+            return `Color(${newColor.r}, ${newColor.g}, ${newColor.b})`, newColor
+        end
+
+        function component:Paint(w, h)
+            local radius = self:getRadius()
+            local diff = h - self.editor:GetTall()
+
+            local default = textures[DEFAULT]
+            local texture = textures[self:getTexture()] ?? default
+
+            local color = self:getColor()
+            default(self, 0, 0, w, diff + radius * 2, color)
+            texture(self, 0, 0, w, diff + radius * 2, color)
+        end
+
+        function component:PerformLayout(w, h)
+            self.editor:SetTall(w * 0.75)
+            self.saturation:SetWide(w)
+
+            local bh = h * 0.1
+            self.clipboard:SetSize(bh, bh)
+            self.clipboard:SetPos(16, 16)
+        end
+
+        return component
+    end
+end
