@@ -10,7 +10,7 @@ Diamond.DB ??= {}
 do
 	Diamond.Package = {
 		name = "Diamond Library",
-		description = "A powerful Garry's Mod library !",
+		description = "A powerful Garry's Mod library!",
 		color = Color(233, 83, 120),
 		author = "Brique au Bob & DARZ",
 		contact = {
@@ -41,9 +41,6 @@ do
 		MsgC(color, `[${name}] `, SERVER and Color(137, 222, 255) or Color(255, 222, 102), "(" .. (SERVER and "SERVER" or "CLIENT") .. ") ", text, ...)
 		Msg("\n")
 	end
-
-	Diamond.Core.Emitter:register(Diamond)
-	Diamond:emit("loaded")
 end
 
 do
@@ -51,7 +48,7 @@ do
 		loader:addDirectory("classes/database", DIAMOND_SERVER, {
 			recursive = true,
 		})
-		loader:addFile("classes/cache", DIAMOND_SHARED)
+		loader:addFile("classes/utilities/cache", DIAMOND_SHARED)
 		loader:addFile("animations/easing/core", DIAMOND_SHARED)
 		loader:addDirectory("core", DIAMOND_SHARED, {
 			realms = {
@@ -63,6 +60,7 @@ do
 			filesToIgnore = {
 				["loader"] = true,
 				["emitter"] = true,
+				["cache"] = true
 			},
 			foldersToIgnore = {
 				["database"] = true
@@ -89,12 +87,18 @@ do
 		loader:addDirectory("components", DIAMOND_CLIENT, {
 			recursive = true
 		})
-		loader:addDirectory("configurator", DIAMOND_SHARED, {
-			recursive = false
-		})
-		loader:addDirectory("configurator/components", DIAMOND_CLIENT, {
-			recursive = true
-		})
+		-- loader:addDirectory("configurator", DIAMOND_SHARED, {
+		-- 	recursive = false
+		-- })
+		-- loader:addDirectory("configurator/components", DIAMOND_CLIENT, {
+		-- 	recursive = true
+		-- })
 		loader:addFile("examples/downloader", DIAMOND_CLIENT)
 	loader:finish()
 end
+
+Diamond.Core.Emitter:register(Diamond)
+Diamond:emit({
+	name = "loaded",
+	triggerHook = true
+})
