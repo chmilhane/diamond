@@ -8,12 +8,11 @@ public class Diamond.Component
         self:setParent(parent)
         self:setBase(base)
 
-        for i, v in pairs(overwrittenProps) do
-            if istable(props[i]) then
-                props[i].value = v
-            else
-                props[i] = v
-            end
+        for i, v of overwrittenProps do
+            continueif not props[i]
+            continueif not istable(props[i])
+
+            props[i].value = istable(v) and v.value or v
         end
 
         self.props = props
@@ -27,6 +26,8 @@ public class Diamond.Component
             [FORCE_BOOL] = () -> return tobool(self) end
         }
 
+        panel.props ??= {}
+
         methods = methods or {
             ["get"] = true,
             ["set"] = true,
@@ -34,24 +35,22 @@ public class Diamond.Component
 
         if methods["get"] then
             panel["get" .. name] = () ->
-                local x = panel[variable]
-                return istable(x) and x.value or x
+                return self?.props?[variable]?.value
             end
         end
 
         if methods["set"] then
             panel["set" .. name] = (value) ->
-                if istable(panel[variable]) then
-                    panel[variable].value = forces?[force] or value
-                else
-                    panel[variable] = forces?[force] or value
-                end
+                stopif not self.props[variable]
+                self.props[variable].value = force and forces?[force](value) or value
 
                 if self.onPropsChanged and isfunction(self.onPropsChanged) then
                     self:onPropsChanged(variable, value, self.props ?? {})
                 end
             end
         end
+
+        return name
     end
 
     create()
@@ -60,16 +59,12 @@ public class Diamond.Component
         local props = self.props
 
         local component = vgui.Create(base, parent)
-        component.props = props
         component = self:render(component)
 
-        function component:updateProps(props = {}: table)
-            for i, v in pairs(table.Merge(self.props, props)) do
-                Diamond.Component:accessorFunc(component, i, istable(v) and v?.force, istable(v) and v?.methods)
-                component[i] = istable(v) and v.value or v
-            end
+        for i, v in pairs(props) do
+            local name = Diamond.Component:accessorFunc(component, i, v.force, v.methods)
+            component.props[i] = v
         end
-        component:updateProps(props)
 
         if component.initialize and isfunction(component.initialize) then
             component:initialize(component.props)
