@@ -1,136 +1,192 @@
 local theme = Diamond.Theme
 
-local styles = {
-    default = function(self, w, h)
-        self.background = theme:lerp(
-            FrameTime() * 8,
-            self.background or self:getBackgroundColor(), 
-            (self:IsDown() or self:getChecked()) and theme:lighten(self:getBackgroundColor(), 0.4) 
-                or self:IsHovered() and theme:lighten(self:getBackgroundColor(), 0.2)
-                or self:getBackgroundColor()
-        )
-        draw.RoundedBox(self:getRadius(), 0, 0, w, h, self.background)
-    end,
-    outlined = function(self, w, h)
-        self.alpha = Lerp(
-            FrameTime() * 8,
-            self.alpha or 0, 
-            (self:IsDown() or self:getChecked()) and 50 or self:IsHovered() and 25 or 0
-        )
-        Diamond:DrawRoundedOutlinedRect(self:getRadius(), 0, 0, w, h, self:getThickness(), self:getBackgroundColor())
-        Diamond:DrawRoundedRect(self:getRadius(), self:getThickness() / 2, self:getThickness() / 2, w - self:getThickness(), h - self:getThickness(), theme:alpha(self:getBackgroundColor(), self.alpha))
-    end,
-    colorOnHover = function(self, w, h)
-        self.alpha = Lerp(
-            FrameTime() * 8,
-            self.alpha or 0, 
-            (self:IsDown() or self:getChecked()) and 255 or self:IsHovered() and 125 or 0
-        )
-        draw.RoundedBox(self:getRadius(), 0, 0, w, h, theme:alpha(self:getBackgroundColor(), self.alpha))
-    end,
-    gradient = function(self, w, h)
-        self.alpha = Lerp(
-            FrameTime() * 8,
-            self.alpha or 0, 
-            (self:IsDown() or self:getChecked()) and 255 or self:IsHovered() and 125 or 0
-        )
-        draw.RoundedBox(self:getRadius(), 0, 0, w, h, theme:alpha(self:getBackgroundColor(), self.alpha))
-        Diamond:DrawRoundedTexturedRect(self:getRadius() - 1, 0, 0, w, h, Diamond.Core.Settings.Materials["gradient"], theme:lighten(theme:alpha(self:getBackgroundColor(), self.alpha), 0.5))
-    end,
-    transparent = function(self, w, h)
-        self.textColor = theme:lerp(
-            FrameTime() * 8,
-            self.textColor or theme:lighten("text", -0.3), 
-            (self:IsDown() or self:getChecked()) and theme:get("text") or self:IsHovered() and theme:lighten("text", -0.15) or theme:lighten("text", -0.3)
-        )
-        return self.textColor
-    end,
-}
-
-Diamond.Components:register("Diamond:Button", (base, ...) =>
-    base:accessorFunc("backgroundColor")
-    base:accessorFunc("radius", FORCE_NUMBER)
-    base:accessorFunc("style", FORCE_STRING)
-    base:accessorFunc("thickness", FORCE_NUMBER)
-    base:accessorFunc("checked", FORCE_BOOL)
-    base:accessorFunc("labelPosition", FORCE_NUMBER)
-    base:accessorFunc("icon")
-    base:accessorFunc("translationY", FORCE_NUMBER)
-
-    function base:Initialize()
-        self:SetTextColor(theme:get("white"))
-        self:SetFont(Diamond:Font(18), { weight = 1000 })
-        self:SetCursor("hand")
-        self:SetMouseInputEnabled(true)
-        self:SetKeyboardInputEnabled(true)
-        self:SetText("")
-        self:setBackgroundColor(theme:get("blue"))
-        self:setLabelPosition(TEXT_ALIGN_CENTER)
-        self:setRadius(theme:get("radius"))
-        self:setThickness(4)
-        self:setChecked(false)
-        self:setTranslationY(0)
-        self:setStyle("default")
-        -- self:setIcon({
-        --     icon = utf8.char(0xf00d),
-        --     font = Diamond:Font(18, { font = "Font Awesome 5 Free Solid" }),
-        -- })
-
-        self.SetText = function(self, text)
-            self.text = text
-        end
-
-        self.GetText = function()
-            return self.text
-        end
+public class Diamond.Components.Button extends Diamond.Component
+    constructor(parent, props)
+        super(parent, "DLabel", {
+            radius = {
+                value = theme:get("radius"),
+                force = FORCE_NUMBER
+            },
+            style = {
+                value = "default",
+                force = FORCE_STRING
+            },
+            thickness = {
+                value = 4,
+                force = FORCE_NUMBER
+            },
+            checked = {
+                value = false,
+                force = FORCE_BOOL
+            },
+            labelPosition = {
+                value = TEXT_ALIGN_CENTER,
+                force = FORCE_NUMBER
+            },
+            translationY = {
+                value = 0,
+                force = FORCE_NUMBER
+            },
+            disabled = {
+                value = false,
+                force = FORCE_BOOL
+            },
+            backgroundColor = { value = theme:get("blue") },
+            icon = {}
+        }, props)
     end
 
-    function base:IsDown()
-        return self.Depressed
-    end
+    static Styles = {
+        default = function(self, w, h)
+            self.background = theme:lerp(
+                FrameTime() * 8,
+                self.background or self:getBackgroundColor(), 
+                (self:isDown() or self:getChecked()) and theme:lighten(self:getBackgroundColor(), 0.4) 
+                    or self:isHovered() and theme:lighten(self:getBackgroundColor(), 0.2)
+                    or self:getBackgroundColor()
+            )
+            draw.RoundedBox(self:getRadius(), 0, 0, w, h, self.background)
+        end,
+        outlined = function(self, w, h)
+            self.alpha = Lerp(
+                FrameTime() * 8,
+                self.alpha or 0, 
+                (self:isDown() or self:getChecked()) and 50 or self:isHovered() and 25 or 0
+            )
+            Diamond:DrawRoundedOutlinedRect(self:getRadius(), 0, 0, w, h, self:getThickness(), self:getBackgroundColor())
+            Diamond:DrawRoundedRect(self:getRadius(), self:getThickness() / 2, self:getThickness() / 2, w - self:getThickness(), h - self:getThickness(), theme:alpha(self:getBackgroundColor(), self.alpha))
+        end,
+        colorOnHover = function(self, w, h)
+            self.alpha = Lerp(
+                FrameTime() * 8,
+                self.alpha or 0, 
+                (self:isDown() or self:getChecked()) and 255 or self:isHovered() and 125 or 0
+            )
+            draw.RoundedBox(self:getRadius(), 0, 0, w, h, theme:alpha(self:getBackgroundColor(), self.alpha))
+        end,
+        gradient = function(self, w, h)
+            self.alpha = Lerp(
+                FrameTime() * 8,
+                self.alpha or 0, 
+                (self:isDown() or self:getChecked()) and 255 or self:isHovered() and 125 or 0
+            )
+            draw.RoundedBox(self:getRadius(), 0, 0, w, h, theme:alpha(self:getBackgroundColor(), self.alpha))
+            Diamond:DrawRoundedTexturedRect(self:getRadius() - 1, 0, 0, w, h, Diamond.Core.Settings.Materials["gradient"], theme:lighten(theme:alpha(self:getBackgroundColor(), self.alpha), 0.5))
+        end,
+        transparent = function(self, w, h)
+            self.textColor = theme:lerp(
+                FrameTime() * 8,
+                self.textColor or theme:lighten("text", -0.3), 
+                (self:isDown() or self:getChecked()) and theme:get("text") or self:isHovered() and theme:lighten("text", -0.15) or theme:lighten("text", -0.3)
+            )
+            return self.textColor
+        end,
+    }
 
-    function base:CalculateLabelPosition(w, h)
-        local x, y = w / 2, h / 2
-        local icon = self:getIcon()
+    render(component)
+        function component:initialize(props)
+            self:SetTextColor(theme:get("white"))
+            self:SetFont(Diamond:Font(18), { weight = 1000 })
+            self:SetMouseInputEnabled(true)
+            self:SetKeyboardInputEnabled(true)
+            self:SetText("")
 
-        if self:getLabelPosition() == TEXT_ALIGN_LEFT then
-            x = h / 2
-        end
-        if self:getLabelPosition() == TEXT_ALIGN_RIGHT then
-            x = w - 16
-        end
-        if icon then
-            x = self:getLabelPosition() == TEXT_ALIGN_RIGHT and x - 20 or self:getLabelPosition() == TEXT_ALIGN_LEFT and x + 16 or x + 10
-        end
+            -- self:setIcon({
+            --     icon = utf8.char(0xf00d),
+            --     font = Diamond:Font(18, { font = "Font Awesome 5 Free Solid" }),
+            -- })
 
-        return x, y
-    end
-
-    function base:Paint(w, h)
-        local style = styles[self:getStyle()] or styles["default"]
-        self.curTranslation = Lerp(FrameTime() * 8, self.curTranslation or 0, self:IsDown() and self:getTranslationY() * 1.5 or self:IsHovered() and self:getTranslationY() or 0)
-
-        local m = Matrix()
-        m:SetTranslation(Vector(0, self.curTranslation, 0))
-
-        local x, y = self:CalculateLabelPosition(w, h)
-        cam.PushModelMatrix(m)
-            local textColor = style(self, w, h)
-
-            local icon = self:getIcon()
-            draw.SimpleText(self:GetText(), self:GetFont(), x + (icon and 12 or 0), y, textColor ?? self:GetTextColor(), self:getLabelPosition(), 1)
-            if icon then
-                draw.SimpleText(icon.icon,
-                    icon.font, 
-                    self:getLabelPosition() == TEXT_ALIGN_RIGHT and x + 20
-                        or self:getLabelPosition() == TEXT_ALIGN_LEFT and x - 20
-                        or x - 50, 
-                    y, 
-                    self:GetTextColor(), 
-                    self:getLabelPosition(),
-                    1
-                )
+            self.SetText = function(self, text)
+                self.text = text
             end
-        cam.PopModelMatrix()
+
+            self.GetText = function()
+                return self.text
+            end
+        end
+
+        function component:isDown()
+            return self:getDisabled() or self.Depressed
+        end
+
+        function component:isHovered()
+            return self:getDisabled() or self:IsHovered()
+        end
+
+        function component:calculateLabelPosition(w, h)
+            local x, y = w / 2, h / 2
+            local icon = self:getIcon()
+
+            if self:getLabelPosition() == TEXT_ALIGN_LEFT then
+                x = h / 2
+            end
+
+            if self:getLabelPosition() == TEXT_ALIGN_RIGHT then
+                x = w - 16
+            end
+
+            if icon then
+                x = self:getLabelPosition() == TEXT_ALIGN_RIGHT and x - 20 or self:getLabelPosition() == TEXT_ALIGN_LEFT and x + 16 or x + 10
+            end
+
+            return x, y
+        end
+
+        function component:doClick()
+
+        end
+
+        function component:DoClick()
+            stopif self:getDisabled()
+            self:doClick()
+        end
+
+        function component:PaintOver(w, h)
+            stopif not self:getDisabled()
+
+            local color = Color(0, 0, 0, 184)
+
+            DisableClipping(true)
+                draw.RoundedBox(self:getRadius(), 0, self.curTranslation, w, h, color)
+            DisableClipping(false)
+        end
+
+        function component:Paint(w, h)
+            local style = Diamond.Components.Button.Styles[self:getStyle()] or Diamond.Components.Button.Styles["default"]
+
+            self.curTranslation = Lerp(
+                FrameTime() * 8,
+                self.curTranslation or 0,
+                self:getDisabled() and 0 or self:isDown() and self:getTranslationY() * 1.5 or self:isHovered() and self:getTranslationY() or 0
+            )
+
+            local m = Matrix()
+            m:SetTranslation(Vector(0, self.curTranslation, 0))
+
+            local x, y = self:calculateLabelPosition(w, h)
+            cam.PushModelMatrix(m)
+                local textColor = style(self, w, h)
+
+                local icon = self:getIcon()
+                draw.SimpleText(self:GetText(), self:GetFont(), x + (icon and 12 or 0), y, textColor ?? self:GetTextColor(), self:getLabelPosition(), 1)
+
+                if icon then
+                    draw.SimpleText(icon.icon,
+                        icon.font, 
+                        self:getLabelPosition() == TEXT_ALIGN_RIGHT and x + 20
+                            or self:getLabelPosition() == TEXT_ALIGN_LEFT and x - 20
+                            or x - 50, 
+                        y, 
+                        self:GetTextColor(), 
+                        self:getLabelPosition(),
+                        1
+                    )
+                end
+            cam.PopModelMatrix()
+
+            self:SetCursor(self:getDisabled() and "no" or "hand")
+        end
+
+        return component
     end
-end, "DLabel")
+end
