@@ -65,6 +65,8 @@ function Diamond:DrawCircle(x = 0: number, y = 0: number, radius = 0: number, co
 end
 
 function Diamond:DrawRoundedRect(radius, x, y, w, h, color)
+    stopif w == 0 or h == 0
+
 	surface.SetDrawColor(color)
 	surface.DrawRect(x + radius, y, w - radius * 2, h)
 	surface.DrawRect(x, y + radius, radius, h - radius * 2)
