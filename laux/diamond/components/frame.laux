@@ -69,37 +69,37 @@ local theme, lang = Diamond.Theme, Diamond.Language
 -- 		self.close = self.header:Add("DButton")
 -- 		self.close:Dock(RIGHT)
 -- 		self.close:SetText("")
--- 		self.close.colors = {
--- 			i = theme:lighten("text", -0.2),
--- 			o = theme:get("text")
--- 		}
--- 		self.close.buttonColor = self.close.colors.i
--- 		self.close.Paint = (this, w, h) =>
--- 			local iconWidth, iconHeight = w / 3.25, h / 3.25
--- 			surface.SetDrawColor(this.buttonColor)
--- 			surface.SetMaterial(Diamond.Core.Settings.Materials.closeButton)
--- 			surface.DrawTexturedRect(w / 2 - iconWidth / 2, h / 2 - iconHeight / 2, iconWidth, iconHeight)
--- 		end
--- 		self.close.OnCursorEntered = (this) =>
--- 			LerpColor("buttonColor",  self.close.colors.o, this)
--- 		end
--- 		self.close.OnCursorExited = (this) =>
--- 			LerpColor("buttonColor",  self.close.colors.i, this)
--- 		end
+		-- self.close.colors = {
+		-- 	i = theme:lighten("text", -0.2),
+		-- 	o = theme:get("text")
+		-- }
+		-- self.close.buttonColor = self.close.colors.i
+		-- self.close.Paint = (this, w, h) =>
+		-- 	local iconWidth, iconHeight = w / 3.25, h / 3.25
+		-- 	surface.SetDrawColor(this.buttonColor)
+		-- 	surface.SetMaterial(Diamond.Core.Settings.Materials.closeButton)
+		-- 	surface.DrawTexturedRect(w / 2 - iconWidth / 2, h / 2 - iconHeight / 2, iconWidth, iconHeight)
+		-- end
+		-- self.close.OnCursorEntered = (this) =>
+		-- 	LerpColor("buttonColor",  self.close.colors.o, this)
+		-- end
+		-- self.close.OnCursorExited = (this) =>
+		-- 	LerpColor("buttonColor",  self.close.colors.i, this)
+		-- end
 -- 		self.close.DoClick = () => 
 -- 			self:Close()
 -- 		end
 
--- 		Diamond:on("themeChanged", (oldTheme, newTheme) =>
--- 			stopif not self or not IsValid(self)
+		-- Diamond:on("themeChanged", (oldTheme, newTheme) =>
+		-- 	stopif not self or not IsValid(self)
 
--- 			self.title:SetTextColor(theme:get("text"))
--- 			self.close.colors = {
--- 				i = theme:lighten("text", -0.2),
--- 				o = theme:get("text")
--- 			}
--- 			self.close.buttonColor = self.close.colors.i
--- 		end)
+		-- 	self.title:SetTextColor(theme:get("text"))
+		-- 	self.close.colors = {
+		-- 		i = theme:lighten("text", -0.2),
+		-- 		o = theme:get("text")
+		-- 	}
+		-- 	self.close.buttonColor = self.close.colors.i
+		-- end)
 -- 	end
 
 -- 	function base:ShowCloseButton(bool)
@@ -174,9 +174,9 @@ public class Diamond.Components.Frame extends Diamond.Component
 				value = 45,
 				force = FORCE_NUMBER
 			},
-			headerColor = theme:lighten("background", 0.25),
-			backgroundColor = theme:get("background"),
-			easeFunction = Diamond.Animations.Ease:get("linear"),
+			headerColor = { value = theme:lighten("background", 0.25) },
+			backgroundColor = { value = theme:get("background") },
+			easeFunction = { value = Diamond.Animations.Ease:get("linear") },
 			fadeDuration = {
 				value = 0.25,
 				force = FORCE_NUMBER
@@ -242,10 +242,39 @@ public class Diamond.Components.Frame extends Diamond.Component
 
 			self.header.closeButton = self.header:Add("DButton")
 			self.header.closeButton:Dock(RIGHT)
+			self.header.closeButton:SetText("")
 			self.header.closeButton.DoClick = () =>
 				self:Close()
 			end
+			self.header.closeButton.colors = {
+				i = theme:lighten("text", -0.2),
+				o = theme:get("text")
+			}
+			self.header.closeButton.buttonColor = self.header.closeButton.colors.i
+			self.header.closeButton.Paint = (this, w, h) =>
+				local iconWidth, iconHeight = w / 3.25, h / 3.25
+				surface.SetDrawColor(this.buttonColor)
+				surface.SetMaterial(Diamond.Core.Settings.Materials.closeButton)
+				surface.DrawTexturedRect(w / 2 - iconWidth / 2, h / 2 - iconHeight / 2, iconWidth, iconHeight)
+			end
+			self.header.closeButton.OnCursorEntered = (this) =>
+				LerpColor("buttonColor",  self.header.closeButton.colors.o, this)
+			end
+			self.header.closeButton.OnCursorExited = (this) =>
+				LerpColor("buttonColor",  self.header.closeButton.colors.i, this)
+			end
 			self:setShowCloseButton(self:getShowCloseButton())
+
+			Diamond:on("themeChanged", (oldTheme, newTheme) =>
+				stopif not self or not IsValid(self)
+
+				self.title:SetTextColor(theme:get("text"))
+				self.header.closeButton.colors = {
+					i = theme:lighten("text", -0.2),
+					o = theme:get("text")
+				}
+				self.header.closeButton.buttonColor = self.header.closeButton.colors.i
+			end)
 
 			self:fadeIn(self:getFadeDuration(), _, (x) => return self:getEaseFunction()(x) end)
 		end
@@ -279,18 +308,15 @@ public class Diamond.Components.Frame extends Diamond.Component
 			local headerHeight = self:getHeaderHeight()
 
 			if self.header then self.header:SetTall(headerHeight) end
-			if self.close then self.close:SetWide(headerHeight) end
+			if self.header.closeButton then self.header.closeButton:SetWide(headerHeight) end
 		end
 
 		return component
 	end
 end
 
-local function openMenu(client)
-	local frame = Diamond.Components.Frame({
-		title = "Test",
-		showCloseButton = false
-	}):create()
+Diamond.Examples:add("menu", (client) =>
+	local frame = Diamond.Components.Frame():create()
 	frame:SetSize(900, 600)
 	frame:MakePopup()
 	frame:Center()
@@ -314,5 +340,4 @@ local function openMenu(client)
 	-- 	button:setRadius(8)
 	-- 	button:setTranslationY(-4)
 	-- end, { BackgroundColor = theme:get("orange"), Radius = 4 })
-end
-concommand.Add("diamond", openMenu)
+end)

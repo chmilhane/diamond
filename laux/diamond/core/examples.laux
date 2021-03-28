@@ -1,0 +1,41 @@
+public class Diamond.Examples
+    static cache = {}
+
+    static getCache(this)
+        return this.cache
+    end
+
+    static getByName(this, name: string)
+        return this.cache[name]
+    end
+
+    static getAll(this)
+        local res = {}
+
+        for i, v in pairs(this.cache ?? {}) do
+            res[#res + 1] = i
+        end
+
+        return res
+    end
+
+    static add(this, index: string, callback)
+        Diamond.Examples.cache[index] = callback
+    end
+end
+
+concommand.Add("diamond", (client, command, args) =>
+    local _, arg = next(args)
+    if not arg then arg = args[1] end
+
+    if not arg or arg == "" or arg == " " then
+        return Diamond:log("All the availables examples are: " .. table.concat(Diamond.Examples:getAll(), ", "))
+    end
+
+    local example = Diamond.Examples:getByName(arg)
+    if not example then
+        Diamond:log(`Example not found! (${arg})`)
+    else
+        example(client, command, args)
+    end
+end)
