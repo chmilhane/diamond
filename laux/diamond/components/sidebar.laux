@@ -1,124 +1,124 @@
--- import Lerp, LerpColor from Diamond.Animations
-local theme = Diamond.Theme
+-- -- import Lerp, LerpColor from Diamond.Animations
+-- local theme = Diamond.Theme
 
-Diamond.Components:register("Diamond:Sidebar", (base, marginContainer) =>
-    base:accessorFunc("backgroundColor")
-    base:accessorFunc("rounded")
+-- Diamond.Components:register("Diamond:Sidebar", (base, marginContainer) =>
+--     base:accessorFunc("backgroundColor")
+--     base:accessorFunc("rounded")
 
-    function base:Initialize()
-        self:SetContainer(self:GetParent(), marginContainer)
-        self:GetVBar():SetWide(0)
-        self:setRounded({ false, false, true, false })
+--     function base:Initialize()
+--         self:SetContainer(self:GetParent(), marginContainer)
+--         self:GetVBar():SetWide(0)
+--         self:setRounded({ false, false, true, false })
 
-        self.active = -1
+--         self.active = -1
 
-        self.buttons = {}
-        self.panels = {}
-        self.cards = {}
-    end
+--         self.buttons = {}
+--         self.panels = {}
+--         self.cards = {}
+--     end
 
-    function base:GetContainer()
-        return self.__container
-    end
+--     function base:GetContainer()
+--         return self.__container
+--     end
 
-    function base:SetContainer(container: Panel, margin = 12: number)
-        local panel = vgui.Create("Panel", container)
-        panel:Dock(FILL)
-        panel:DockMargin(math.max(margin, 4), margin, 0, margin)
+--     function base:SetContainer(container: Panel, margin = 12: number)
+--         local panel = vgui.Create("Panel", container)
+--         panel:Dock(FILL)
+--         panel:DockMargin(math.max(margin, 4), margin, 0, margin)
 
-        self.__container = panel
-    end
+--         self.__container = panel
+--     end
 
-    function base:AddCard(panel = "Panel": string|Panel, tall = 60, custom = function() end)
-        local card = nil
-        if Diamond.Components:get(panel) then
-            card = Diamond.Components:create(panel, self)
-        else
-            card = self:Add(panel)
-        end
-        card:Dock(TOP)
-        card:DockMargin(12, 12, 12, 0)
-        card:SetTall(type(panel) == 'Panel' and panel:GetTall() or tall)
-        custom(card)
+--     function base:AddCard(panel = "Panel": string|Panel, tall = 60, custom = function() end)
+--         local card = nil
+--         if Diamond.Components:get(panel) then
+--             card = Diamond.Components:create(panel, self)
+--         else
+--             card = self:Add(panel)
+--         end
+--         card:Dock(TOP)
+--         card:DockMargin(12, 12, 12, 0)
+--         card:SetTall(type(panel) == 'Panel' and panel:GetTall() or tall)
+--         custom(card)
 
-        self.cards[#self.cards + 1] = card
-        return card
-    end
+--         self.cards[#self.cards + 1] = card
+--         return card
+--     end
 
-    function base:AddPanel(text: string, icon, panel = "Panel", options = {}: table)
-        local button = Diamond.Components:create("Diamond:Button", self)
-        button:Dock(TOP)
-        button:SetTall(45)
-        button:SetText(text)
-        button:DockMargin(12, 12, 12, 0)
-        button:setLabelPosition(TEXT_ALIGN_LEFT)
-        button:setStyle("gradient")
+--     function base:AddPanel(text: string, icon, panel = "Panel", options = {}: table)
+--         local button = Diamond.Components:create("Diamond:Button", self)
+--         button:Dock(TOP)
+--         button:SetTall(45)
+--         button:SetText(text)
+--         button:DockMargin(12, 12, 12, 0)
+--         button:setLabelPosition(TEXT_ALIGN_LEFT)
+--         button:setStyle("gradient")
 
-        if (not options.BackgroundColor) then
-            options.BackgroundColor = theme:getCurrentColor()
+--         if (not options.BackgroundColor) then
+--             options.BackgroundColor = theme:getCurrentColor()
 
-            Diamond:on("colorChanged", (oldColor, newColor) =>
-                stopif not self or not IsValid(self)
-                button:setBackgroundColor(newColor)
-            end)
-        else
-            button:setBackgroundColor(options.BackgroundColor)
-        end
+--             Diamond:on("colorChanged", (oldColor, newColor) =>
+--                 stopif not self or not IsValid(self)
+--                 button:setBackgroundColor(newColor)
+--             end)
+--         else
+--             button:setBackgroundColor(options.BackgroundColor)
+--         end
 
-        for i, v of options do
-            stopif not button["set" .. i]
-            button["set" .. i](button, v)
-        end
+--         for i, v of options do
+--             stopif not button["set" .. i]
+--             button["set" .. i](button, v)
+--         end
 
-        if (icon) then
-            button:setIcon({
-                icon = icon,
-                font = Diamond:Font(18, { font = "Font Awesome 5 Free Solid" }),
-            })
-        end
+--         if (icon) then
+--             button:setIcon({
+--                 icon = icon,
+--                 font = Diamond:Font(18, { font = "Font Awesome 5 Free Solid" }),
+--             })
+--         end
 
-        local index = #self.buttons + 1
-        button.DoClick = (this) =>
-            self:SelectPanel(index)
-        end
+--         local index = #self.buttons + 1
+--         button.DoClick = (this) =>
+--             self:SelectPanel(index)
+--         end
 
-        self.panels[#self.panels + 1] = panel
-        self.buttons[index] = button
+--         self.panels[#self.panels + 1] = panel
+--         self.buttons[index] = button
 
-        self:SelectPanel(1)
-    end
+--         self:SelectPanel(1)
+--     end
 
-    function base:SelectPanel(index: number)
-        stopif index == self.active
+--     function base:SelectPanel(index: number)
+--         stopif index == self.active
 
-        local container = self:GetContainer()
-        container:AlphaTo(0, 0.15, 0, function()
-            container:Clear()
+--         local container = self:GetContainer()
+--         container:AlphaTo(0, 0.15, 0, function()
+--             container:Clear()
 
-            local panel = self.panels[index] ?? self.panels[1]
-            if Diamond.Components:get(panel) then
-                local _panel = panel
-                panel = (parent) =>
-                    Diamond.Components:create(_panel, parent):Dock(FILL)
-                end
-            end
-            if isfunction(panel) then
-                panel(container)
-            else
-                vgui.Create(panel, container):Dock(FILL)
-            end
-            container:AlphaTo(255, 0.15)
-        end)
+--             local panel = self.panels[index] ?? self.panels[1]
+--             if Diamond.Components:get(panel) then
+--                 local _panel = panel
+--                 panel = (parent) =>
+--                     Diamond.Components:create(_panel, parent):Dock(FILL)
+--                 end
+--             end
+--             if isfunction(panel) then
+--                 panel(container)
+--             else
+--                 vgui.Create(panel, container):Dock(FILL)
+--             end
+--             container:AlphaTo(255, 0.15)
+--         end)
 
-        local button = self.buttons[index]
-        local activeButton = self.buttons[self.active] ?? self.buttons[1] 
-        activeButton:setChecked(false)
-        button:setChecked(true)
+--         local button = self.buttons[index]
+--         local activeButton = self.buttons[self.active] ?? self.buttons[1] 
+--         activeButton:setChecked(false)
+--         button:setChecked(true)
 
-        self.active = index
-    end
+--         self.active = index
+--     end
 
-    function base:Paint(w, h)
-        draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, self:getBackgroundColor() or theme:lighten("background", -0.2), unpack(self:getRounded()))
-    end
-end, "DScrollPanel")
+--     function base:Paint(w, h)
+--         draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, self:getBackgroundColor() or theme:lighten("background", -0.2), unpack(self:getRounded()))
+--     end
+-- end, "DScrollPanel")

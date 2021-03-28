@@ -1,62 +1,62 @@
-local theme = Diamond.Theme
+-- local theme = Diamond.Theme
 
-Diamond.Components:register("Diamond:CheckBox", (base, ...) =>
-    base:accessorFunc("enabledColor")
-    base:accessorFunc("disabledColor")
-    base:accessorFunc("baseColor")
-    base:accessorFunc("drawIcon", FORCE_BOOL)
+-- Diamond.Components:register("Diamond:CheckBox", (base, ...) =>
+--     base:accessorFunc("enabledColor")
+--     base:accessorFunc("disabledColor")
+--     base:accessorFunc("baseColor")
+--     base:accessorFunc("drawIcon", FORCE_BOOL)
 
-    function base:Initialize()
-        self:SetSize(70, 40)
-        self:SetText("")
+--     function base:Initialize()
+--         self:SetSize(70, 40)
+--         self:SetText("")
 
-        self:setEnabledColor(theme:get("green"))
-        self:setDisabledColor(theme:get("red"))
-        self:setBaseColor(theme:get("white"))
-        self:setDrawIcon(true)
+--         self:setEnabledColor(theme:get("green"))
+--         self:setDisabledColor(theme:get("red"))
+--         self:setBaseColor(theme:get("white"))
+--         self:setDrawIcon(true)
 
-        self:setChecked(true, true)
-        self.color = self:getChecked() and self:getEnabledColor() or self:getDisabledColor()
-        self.anim = 0
-    end
+--         self:setChecked(true, true)
+--         self.color = self:getChecked() and self:getEnabledColor() or self:getDisabledColor()
+--         self.anim = 0
+--     end
 
-    function base:getChecked()
-        return self.checked
-    end
+--     function base:getChecked()
+--         return self.checked
+--     end
 
-    function base:setChecked(state = false: boolean, silent = false: boolean)
-        self.checked = state
+--     function base:setChecked(state = false: boolean, silent = false: boolean)
+--         self.checked = state
 
-        if not silent then
-            self:onCheckedChanged(state)
-        end
-    end
+--         if not silent then
+--             self:onCheckedChanged(state)
+--         end
+--     end
 
-    function base:toggle()
-        self:setChecked(not self:getChecked())
-    end
+--     function base:toggle()
+--         self:setChecked(not self:getChecked())
+--     end
 
-    function base:onCheckedChanged(state)
+--     function base:onCheckedChanged(state)
 
-    end
+--     end
 
-    function base:DoClick()
-        self:toggle()
-    end
+--     function base:DoClick()
+--         self:toggle()
+--     end
 
-    function base:Paint(w, h)
-        local m = h * 0.2
-        local c = h / 2 - 4
+--     function base:Paint(w, h)
+--         local m = h * 0.2
+--         local c = h / 2 - 4
 
-        self.color = theme:lerp(FrameTime() * 8, self.color, self:getChecked() and self:getEnabledColor() or self:getDisabledColor())
-        self.anim = Lerp(FrameTime() * 8, self.anim, self:getChecked() and (w - c - 4) or c + 4)
+--         self.color = theme:lerp(FrameTime() * 8, self.color, self:getChecked() and self:getEnabledColor() or self:getDisabledColor())
+--         self.anim = Lerp(FrameTime() * 8, self.anim, self:getChecked() and (w - c - 4) or c + 4)
 
-        draw.RoundedBox(h / 2, 0, 0, w, h, self.color)
-        -- draw.RoundedBox(h / 2, m / 2 + self.anim, m / 2, h - m, h - m, self:getBaseColor())
-        Diamond:DrawCircle(self.anim, h / 2, c, self:getBaseColor(), _, _, true)
+--         draw.RoundedBox(h / 2, 0, 0, w, h, self.color)
+--         -- draw.RoundedBox(h / 2, m / 2 + self.anim, m / 2, h - m, h - m, self:getBaseColor())
+--         Diamond:DrawCircle(self.anim, h / 2, c, self:getBaseColor(), _, _, true)
 
-        if self:getDrawIcon() then
-            Diamond:DrawIcon(self:getChecked() and "f00c" or "f00d", "Solid", h * 0.5, self.anim, h / 2, 1, 1, self.color)
-        end
-    end
-end, "DButton")
+--         if self:getDrawIcon() then
+--             Diamond:DrawIcon(self:getChecked() and "f00c" or "f00d", "Solid", h * 0.5, self.anim, h / 2, 1, 1, self.color)
+--         end
+--     end
+-- end, "DButton")

@@ -1,27 +1,27 @@
-Diamond.Components:register("Diamond:Avatar", (base, ...) =>
-    base:accessorFunc("radius", FORCE_NUMBER)
+-- Diamond.Components:register("Diamond:Avatar", (base, ...) =>
+--     base:accessorFunc("radius", FORCE_NUMBER)
 
-    function base:Initialize()
-        self:setRadius(4)
+--     function base:Initialize()
+--         self:setRadius(4)
 
-        self.avatar = vgui.Create("AvatarImage", self)
-        self.avatar:SetPaintedManually(true)
-        self.avatar:Dock(FILL)
-    end
+--         self.avatar = vgui.Create("AvatarImage", self)
+--         self.avatar:SetPaintedManually(true)
+--         self.avatar:Dock(FILL)
+--     end
 
-    function base:SetPlayer(...)
-        self.avatar:SetPlayer(...)
-    end
+--     function base:SetPlayer(...)
+--         self.avatar:SetPlayer(...)
+--     end
 
-    function base:SetSteamID(...)
-        self.avatar:SetSteamID(...)
-    end
+--     function base:SetSteamID(...)
+--         self.avatar:SetSteamID(...)
+--     end
 
-    function base:Paint(w, h)
-        Diamond:MaskStencil(() =>
-            Diamond:DrawRoundedRect(self:getRadius(), 0, 0, w, h, color_white)
-        end, () =>
-            self.avatar:PaintManual()
-        end)
-    end
-end)
+--     function base:Paint(w, h)
+--         Diamond:MaskStencil(() =>
+--             Diamond:DrawRoundedRect(self:getRadius(), 0, 0, w, h, color_white)
+--         end, () =>
+--             self.avatar:PaintManual()
+--         end)
+--     end
+-- end)
