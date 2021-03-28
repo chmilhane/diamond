@@ -1,37 +1,39 @@
 class Theme
-    COLORS = {
-        red = Color( 237, 41, 57 ),
-        orange = Color( 255, 105, 0 ),
-        yellow = Color( 255, 191, 0 ),
-        purple = Color( 106, 79, 236 ),
-        blue = Color( 14, 87, 196 ),
-        green = Color( 0, 168, 107 ),
-        cyan = Color( 32, 174, 150 ),
-        pink = Color( 247, 106, 140 ),
+    _colors = {
+        red = Color(237, 41, 57),
+        orange = Color(255, 105, 0),
+        yellow = Color(255, 191, 0),
+        purple = Color(106, 79, 236),
+        blue = Color(14, 87, 196),
+        green = Color(0, 168, 107),
+        cyan = Color(32, 174, 150),
+        pink = Color(247, 106, 140),
 
-        white = Color( 255, 255, 255 ),
-        black = Color( 0, 0, 0 ),
+        white = Color(255, 255, 255),
+        black = Color(0, 0, 0),
     }
-    THEMES = {
+
+    _themes = {
         light = {
-            background = Color( 212, 212, 212 ),
+            background = Color(212, 212, 212),
             text = Color(12, 12, 12),
             radius = 8,
-            text = Color( 0, 0, 0),
+            text = Color(0, 0, 0),
         },
         dark = {
             background = Color(32, 32, 32),
             text = Color(255, 255, 255),
             radius = 8,
-            text = Color( 255, 255, 255),
+            text = Color(255, 255, 255),
         },
         night = {
-            background = Color( 46, 49, 56 ),
-            text = Color( 255, 255, 255 ),
+            background = Color(46, 49, 56),
+            text = Color(255, 255, 255),
             radius = 8,
-            text = Color( 255, 255, 255),
+            text = Color(255, 255, 255),
         },
     }
+
     _get currentColor
     _get currentTheme
 
@@ -45,7 +47,7 @@ class Theme
     end
 
     get(color)
-        return self.COLORS[color] or self.THEMES[self:getCurrentTheme()][color] or IsColor(color) and color or self.COLORS[self:getCurrentColor()]
+        return self._colors[color] or self._themes[self:getCurrentTheme()][color] or IsColor(color) and color or self._colors[self:getCurrentColor()]
     end
 
     lighten(color, fraction, alpha)
@@ -72,7 +74,7 @@ class Theme
     end
 
     setCurrentColor(color)
-        stopif not self.COLORS[color]
+        stopif not self._colors[color]
 
         local oldPreference = self.currentColor
 
@@ -85,7 +87,7 @@ class Theme
     end
 
     setCurrentTheme(theme)
-        stopif not self.THEMES[theme]
+        stopif not self._themes[theme]
 
         local oldTheme = self.currentTheme
 
@@ -98,7 +100,7 @@ class Theme
     end
 
     getActiveTheme()
-        return self.THEMES[self:getCurrentTheme()]
+        return self._themes[self:getCurrentTheme()]
     end
 
     -- > method used to save current settings
@@ -117,8 +119,8 @@ class Theme
 
     list()
         return {
-            ["modes"] = self.THEMES,
-            ["colors"] = self.COLORS
+            ["modes"] = self._themes,
+            ["colors"] = self._colors
         }
     end
 end
