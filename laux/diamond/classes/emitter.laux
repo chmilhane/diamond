@@ -2,18 +2,26 @@ Diamond.Core.Emitter ??= {}
 
 local Emitter = {}
 do
-	function Emitter:emit(event: string|number, ...)
-		stopif not self.events[event]
+	function Emitter:emit(event: string|number|table, ...)
+		local name = istable(event) and event?.name or event
+		stopif not self.events[name]
 
-		local t = self.events[event]
+		local t = self.events[name]
 		for i, e in ipairs(t or {}) do
 			e(...)
+		end
+
+		if istable(event) and event?.triggerHook then
+			local prefix = event.prefix or "Diamond"
+			local niceName = name:gsub("^%l", string.upper)
+
+			hook.Run(`${prefix}.${niceName}`, ...)
 		end
 	end
 
 	function Emitter:on(event: string|number, action)
-		if (not self.events[event]) then
-		self.events[event] = {}
+		if not self.events[event] then
+			self.events[event] = {}
 		end
 
 		-- local level = 1
