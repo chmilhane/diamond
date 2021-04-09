@@ -63,9 +63,9 @@ public class Diamond.Loader
 	end
 
 	private log(...)
-		local { color, name } = self:getPackage()
+		local package = self:getPackage()
 
-		MsgC(color, `[${name}] `, SERVER and Color(137, 222, 255) or Color(255, 222, 102), "(" .. (SERVER and "SERVER" or "CLIENT") .. ") ", Diamond.Loader.Colors.Text, ...)
+		MsgC(package.Color, `[${package.Name}] `, SERVER and Color(137, 222, 255) or Color(255, 222, 102), "(" .. (SERVER and "SERVER" or "CLIENT") .. ") ", Diamond.Loader.Colors.Text, ...)
 		Msg("\n")
 	end
 
