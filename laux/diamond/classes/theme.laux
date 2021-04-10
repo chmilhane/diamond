@@ -81,7 +81,7 @@ class Theme
         self.currentColor = color
         self:save()
 
-        Diamond:emit("colorChanged", oldPreference, color)
+        hook.Run("Diamond.ColorChanged", oldPreference, color)
 
         return self
     end
@@ -94,7 +94,7 @@ class Theme
         self.currentTheme = theme
         self:save()
 
-        Diamond:emit("themeChanged", oldTheme, theme)
+        hook.Run("Diamond.ThemeChanged", oldTheme, theme)
 
         return self
     end

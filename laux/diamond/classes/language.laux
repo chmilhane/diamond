@@ -1,4 +1,4 @@
-public class Diamond.Core.Language
+public class Diamond.Languages
     _get _set defaultLanguage
     _get _set activeLanguage
 
@@ -11,6 +11,7 @@ public class Diamond.Core.Language
 
     add(index: string, content: table)
         self.cache[string.StripExtension(index)] = content
+        return self
     end
 
     addFile(path: string, index)
@@ -19,6 +20,7 @@ public class Diamond.Core.Language
         end
 
         self:add(index ?? string.GetFileFromFilename(path), include(path) ?? {})
+        return self
     end
 
     addDirectory(path: string)
@@ -26,6 +28,8 @@ public class Diamond.Core.Language
         for i, v in ipairs(files) do
             self:addFile(path .. "/" .. v)
         end
+
+        return self
     end
 
     async download(index: string, url: string)
@@ -48,5 +52,5 @@ public class Diamond.Core.Language
     end
 end
 
-Diamond.Language = Diamond.Core.Language()
+Diamond.Language = Diamond.Languages()
 Diamond.Language:addDirectory("diamond/languages")

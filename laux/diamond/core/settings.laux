@@ -10,4 +10,4 @@ SETTINGS.Materials = {
     ["gradient"] = Material("vgui/gradient-r", "smooth"),
 }
 
-Diamond.Core.Settings = SETTINGS
+Diamond.Settings = SETTINGS

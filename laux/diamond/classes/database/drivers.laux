@@ -1,12 +1,12 @@
-Diamond.DB.Drivers ??= {}
+Diamond.Database.Drivers ??= {}
 
-public class Diamond.DB.Drivers.MySQL
+public class Diamond.Database.Drivers.MySQL
     static auto_increments()
         return "AUTOINCREMENT"
     end
 end
 
-public class Diamond.DB.Drivers.SQLite
+public class Diamond.Database.Drivers.SQLite
     static auto_increments()
         return "AUTO_INCREMENT"
     end

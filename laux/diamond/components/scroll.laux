@@ -20,3 +20,4 @@
 -- end, "DScrollPanel")
 
 -- include("diamond/configurator/components/tabs/permissions.lua")
+local x

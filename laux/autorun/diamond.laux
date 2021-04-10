@@ -1,104 +1,95 @@
 Diamond ??= {}
 
-Diamond.Core ??= {}
 Diamond.Network ??= {}
 Diamond.Theme ??= {}
 Diamond.Animations ??= {}
 Diamond.Configurator ??= {}
-Diamond.DB ??= {}
+Diamond.Database ??= {}
 
-do
-	Diamond.Package = {
-		name = "Diamond Library",
-		description = "A powerful Garry's Mod library!",
-		color = Color(233, 83, 120),
-		author = "Brique au Bob & DARZ",
-		contact = {
-			"http://discord.com/users/709064224252624936",
-			"http://discord.com/users/307531336388968458",
-		},
-		root = "diamond"
+Diamond.Package = {
+	Name = "Diamond Library",
+	Description = "A powerful Garry's Mod library!",
+	Color = Color(233, 83, 120),
+	Root = "diamond",
+	Author = {
+		"DARZ",
+		"Brique au Bob"
+	},
+	Contact = {
+		"http://discord.com/users/709064224252624936",
+		"http://discord.com/users/307531336388968458",
 	}
+}
+
+function Diamond:Log(...)
+	local { Name, Color } = Diamond.Package
+
+	MsgC(Color, `[${Name}] `, SERVER and Color(137, 222, 255) or Color(255, 222, 102), "(" .. (SERVER and "SERVER" or "CLIENT") .. ") ", Diamond.Loader.Colors.Text, ...)
+	Msg("\n")
 end
 
 do
-	local { root } = Diamond.Package
+	local { Root } = Diamond.Package
 
 	if (SERVER) then
-		AddCSLuaFile(root .. "/classes/loader.lua")
-		AddCSLuaFile(root .. "/classes/emitter.lua")
+		AddCSLuaFile(Root .. "/classes/loader.lua")
 	end
 
-	include(root .. "/classes/loader.lua")
-	include(root .. "/classes/emitter.lua")
+	include(Root .. "/classes/loader.lua")
 end
 
 do
-	function Diamond:log(...)
-		local { name, color } = Diamond.Package
-		local { text } = Diamond.Core.Loader.logTheme
-
-		MsgC(color, `[${name}] `, SERVER and Color(137, 222, 255) or Color(255, 222, 102), "(" .. (SERVER and "SERVER" or "CLIENT") .. ") ", text, ...)
-		Msg("\n")
-	end
-end
-
-do
-	local loader = Diamond.Core.Loader(Diamond.Package)
-		loader:addDirectory("classes/database", DIAMOND_SERVER, {
-			recursive = true,
-		})
-		loader:addFile("classes/cache", DIAMOND_SHARED)
-		loader:addFile("animations/easing/core", DIAMOND_SHARED)
-		loader:addDirectory("core", DIAMOND_SHARED, {
-			realms = {
-				["examples"] = DIAMOND_CLIENT
-			}
-		})
-		loader:addDirectory("classes", DIAMOND_SHARED, {
-			recursive = true,
-			filesToIgnore = {
-				["loader"] = true,
-				["emitter"] = true,
-				["cache"] = true
-			},
-			foldersToIgnore = {
-				["database"] = true
-			},
-			realms = {
-				["components"] = DIAMOND_CLIENT
-			}
-		})
-		loader:addDirectory("libraries", DIAMOND_SHARED, {
-			realms = {
-				["shadows"] = DIAMOND_CLIENT
-			}
-		})
-		loader:addDirectory("utilities", DIAMOND_SHARED, {
-			realms = {
-				["miscellaneous"] = DIAMOND_CLIENT
-			}
-		})
-		loader:addDirectory("utilities/entities", DIAMOND_SHARED)
-		loader:addDirectory("animations", DIAMOND_SHARED, {
-			recursive = false
-		})
-		loader:addDirectory("animations/panel", DIAMOND_CLIENT)
-		loader:addDirectory("components", DIAMOND_CLIENT, {
-			recursive = true
-		})
+	local loader = Diamond.Loader(Diamond.Package)
+		loader:add("classes/cache", DIAMOND_SHARED)
+		loader:add("animations/easing/core", DIAMOND_SHARED)
+		-- loader:addDirectory("classes/database", DIAMOND_SERVER, {
+		-- 	recursive = true,
+		-- })
+		-- loader:addDirectory("core", DIAMOND_SHARED, {
+			-- realms = {
+				-- ["examples"] = DIAMOND_CLIENT
+			-- }
+		-- })
+		-- loader:addDirectory("classes", DIAMOND_SHARED, {
+			-- recursive = true,
+			-- filesToIgnore = {
+				-- ["loader"] = true,
+				-- ["emitter"] = true,
+				-- ["cache"] = true
+			-- },
+			-- foldersToIgnore = {
+				-- ["database"] = true
+			-- },
+			-- realms = {
+				-- ["components"] = DIAMOND_CLIENT
+			-- }
+		-- })
+		-- loader:addDirectory("libraries", DIAMOND_SHARED, {
+			-- realms = {
+				-- ["shadows"] = DIAMOND_CLIENT
+			-- }
+		-- })
+		-- loader:addDirectory("utilities", DIAMOND_SHARED, {
+			-- realms = {
+				-- ["miscellaneous"] = DIAMOND_CLIENT
+			-- }
+		-- })
+		-- loader:addDirectory("utilities/entities", DIAMOND_SHARED)
+		-- loader:addDirectory("animations", DIAMOND_SHARED, {
+			-- recursive = false
+		-- })
+		-- loader:addDirectory("animations/panel", DIAMOND_CLIENT)
+		-- loader:addDirectory("components", DIAMOND_CLIENT, {
+			-- recursive = true
+		-- })
 		-- loader:addDirectory("configurator", DIAMOND_SHARED, {
 		-- 	recursive = false
 		-- })
 		-- loader:addDirectory("configurator/components", DIAMOND_CLIENT, {
 		-- 	recursive = true
 		-- })
-		loader:addFile("examples/downloader", DIAMOND_CLIENT)
+		-- loader:add("examples/downloader", DIAMOND_CLIENT)
 	loader:finish()
 end
 
-Diamond.Core.Emitter:register(Diamond)
-Diamond:emit({
-	name = "loaded",
-	triggerHook = true
-})
+hook.Run("Diamond.Loaded", Diamond)

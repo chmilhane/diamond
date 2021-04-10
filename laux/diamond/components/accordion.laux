@@ -44,7 +44,7 @@
             draw.SimpleText(self:getText(), self:getFont(), h / 2, h / 2, theme:get("text"), 0, 1)
 
             local size = h / 4
-            Diamond:DrawTexturedRect((w - size) - h / 2, h / 2 - size / 2, size, size, Diamond.Core.Settings.Materials["arrow"], theme:get("text"), self.rotation)
+            Diamond:DrawTexturedRect((w - size) - h / 2, h / 2 - size / 2, size, size, Diamond.Settings.Materials["arrow"], theme:get("text"), self.rotation)
         end
     end, "DButton")
 
@@ -61,3 +61,4 @@
     end
     openMenu()
 ]]
+local x

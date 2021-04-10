@@ -48,7 +48,7 @@ public class Diamond.Models
 
     constructor(child)
         self.table = self.table or self:__type():lower():Replace(".", "_")
-        self.connection = Diamond.DB(self.table)
+        self.connection = Diamond.Database(self.table)
     end
 
     where(key, value, operator, keyword)
@@ -129,7 +129,7 @@ public class Diamond.Models
     end
 end
 
--- local req = Diamond.DB('batk_users')
+-- local req = Diamond.Database('batk_users')
 --     :where('name', 'Brique au bob')
 --     :join('batk_warns', 'steamid64', '=', 'user_id')
 

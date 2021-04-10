@@ -71,7 +71,7 @@ public class Diamond.Components.Button extends Diamond.Component
                 (self:isDown() or self:getChecked()) and 255 or self:isHovered() and 125 or 0
             )
             draw.RoundedBox(self:getRadius(), 0, 0, w, h, theme:alpha(self:getBackgroundColor(), self.alpha))
-            Diamond:DrawRoundedTexturedRect(self:getRadius() - 1, 0, 0, w, h, Diamond.Core.Settings.Materials["gradient"], theme:lighten(theme:alpha(self:getBackgroundColor(), self.alpha), 0.5))
+            Diamond:DrawRoundedTexturedRect(self:getRadius() - 1, 0, 0, w, h, Diamond.Settings.Materials["gradient"], theme:lighten(theme:alpha(self:getBackgroundColor(), self.alpha), 0.5))
         end,
         transparent = function(self, w, h)
             self.textColor = theme:lerp(

@@ -20,3 +20,4 @@
 --         self.navbar:SelectPanel(1)
 --     end
 -- end)
+local x

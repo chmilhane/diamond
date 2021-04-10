@@ -20,7 +20,10 @@ public class Diamond.Network
 			local callback = self.cache:get(index)
 
 			client = client or CLIENT and LocalPlayer()
-			callback(len, client)
+
+			if callback and isfunction(callback) then
+				callback(len, client)
+			end
         end)
 	end
 
@@ -31,7 +34,7 @@ public class Diamond.Network
 	--[[
         * @param number index
         * @param function callback
-        * @aram nil|Player|CRecipientFilter receiver
+        * @param nil|Player|CRecipientFilter receiver
 	]]
 	send(index: number, callback, receiver)
 		net.Start(self:getName())

@@ -43,7 +43,7 @@ public class Diamond.Components.Progress extends Diamond.Component
 
             local color = Color(255 - f * 255, f * 255, 0)
             Diamond:DrawRoundedRect(r, x, y, width, height, color)
-            Diamond:DrawRoundedTexturedRect(r, x, y, width, height, Diamond.Core.Settings.Materials["gradient"], theme:lighten(color, -0.4))
+            Diamond:DrawRoundedTexturedRect(r, x, y, width, height, Diamond.Settings.Materials["gradient"], theme:lighten(color, -0.4))
 
             stopif not self:getPercentage()
 

@@ -39,3 +39,4 @@
 --         self.avatar:SetWide(h - 16)
 --     end
 -- end)
+local x

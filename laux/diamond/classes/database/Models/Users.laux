@@ -23,7 +23,7 @@ public class BATK.Warns extends Diamond.Models
 end
 
 
--- local req = Diamond.DB('batk_users')
+-- local req = Diamond.Database('batk_users')
 --     :where('name', 'Brique au bob')
 --     :join('batk_warns', 'steamid64', '=', 'user_id')
 

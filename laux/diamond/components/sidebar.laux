@@ -122,3 +122,4 @@
 --         draw.RoundedBoxEx(theme:get("radius"), 0, 0, w, h, self:getBackgroundColor() or theme:lighten("background", -0.2), unpack(self:getRounded()))
 --     end
 -- end, "DScrollPanel")
+local x

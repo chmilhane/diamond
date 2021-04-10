@@ -1,6 +1,6 @@
-import MySQL, SQLite from Diamond.DB.Drivers
+import MySQL, SQLite from Diamond.Database.Drivers
 
-public class Diamond.DB
+public class Diamond.Database
     _where = {}
     _joins = {}
     _select = {}

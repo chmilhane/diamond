@@ -23,7 +23,7 @@ local textures = {
             color.b + color.b * fract
         )
 
-        Diamond:DrawRoundedTexturedRect(radius or self:getRadius() - 1, x or 0, y or 0, w, h, Diamond.Core.Settings.Materials["gradient"], newColor)
+        Diamond:DrawRoundedTexturedRect(radius or self:getRadius() - 1, x or 0, y or 0, w, h, Diamond.Settings.Materials["gradient"], newColor)
     end
 }
 

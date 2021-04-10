@@ -53,7 +53,7 @@ Diamond.Components:register("Diamond:Configurator:Tabs:Permissions", (base, conf
                 popupHerit:SetTall(100)
                 function popupHerit:Paint(w, h)
                     Diamond:DrawRoundedRect(theme:get("radius"), 0, 0, w, h, theme:get(configuration.package.color))
-                    Diamond:DrawRoundedTexturedRect(theme:get("radius"), 0, 0, w, h, Diamond.Core.Settings.Materials.gradient, theme:lighten(configuration.package.color, 0.25))
+                    Diamond:DrawRoundedTexturedRect(theme:get("radius"), 0, 0, w, h, Diamond.Settings.Materials.gradient, theme:lighten(configuration.package.color, 0.25))
                 end
 
                 local warning = vgui.Create("DLabel", popupHerit)

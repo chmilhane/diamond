@@ -2,8 +2,8 @@ public class Diamond.AnimationBase
 	_get _set panel
 
 	constructor(panel: Panel, duration, callback, easeFunction)
-		duration ??= Diamond.Core.Settings.DefaultAnimationLength
-		easeFunction ??= Diamond.Core.Settings.DefaultEaseFunction
+		duration ??= Diamond.Settings.DefaultAnimationLength
+		easeFunction ??= Diamond.Settings.DefaultEaseFunction
 
 		local anim = panel:NewAnimation(duration)
 		self:setPanel(panel)
@@ -36,8 +36,8 @@ end
 
 --[[
 	function Diamond:GetAnimationFraction(duration, ease)
-		duration = duration or Diamond.Core.Settings.DefaultAnimationLength
-		ease = ease or Diamond.Core.Settings.DefaultAnimationEase or (x) => return x end
+		duration = duration or Diamond.Settings.DefaultAnimationLength
+		ease = ease or Diamond.Settings.DefaultAnimationEase or (x) => return x end
 
 		local fraction = math.TimeFraction(startTime, startTime + duration, CurTime())
 		return fraction <= 0 and 1 or ease(fraction) ?? fraction

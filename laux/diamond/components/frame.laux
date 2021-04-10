@@ -77,7 +77,7 @@ local theme, lang = Diamond.Theme, Diamond.Language
 		-- self.close.Paint = (this, w, h) =>
 		-- 	local iconWidth, iconHeight = w / 3.25, h / 3.25
 		-- 	surface.SetDrawColor(this.buttonColor)
-		-- 	surface.SetMaterial(Diamond.Core.Settings.Materials.closeButton)
+		-- 	surface.SetMaterial(Diamond.Settings.Materials.closeButton)
 		-- 	surface.DrawTexturedRect(w / 2 - iconWidth / 2, h / 2 - iconHeight / 2, iconWidth, iconHeight)
 		-- end
 		-- self.close.OnCursorEntered = (this) =>
@@ -254,7 +254,7 @@ public class Diamond.Components.Frame extends Diamond.Component
 			self.header.closeButton.Paint = (this, w, h) =>
 				local iconWidth, iconHeight = w / 3.25, h / 3.25
 				surface.SetDrawColor(this.buttonColor)
-				surface.SetMaterial(Diamond.Core.Settings.Materials.closeButton)
+				surface.SetMaterial(Diamond.Settings.Materials.closeButton)
 				surface.DrawTexturedRect(w / 2 - iconWidth / 2, h / 2 - iconHeight / 2, iconWidth, iconHeight)
 			end
 			self.header.closeButton.OnCursorEntered = (this) =>
@@ -265,7 +265,7 @@ public class Diamond.Components.Frame extends Diamond.Component
 			end
 			self:setShowCloseButton(self:getShowCloseButton())
 
-			Diamond:on("themeChanged", (oldTheme, newTheme) =>
+			hook.Add("Diamond.ThemeChanged", (oldTheme, newTheme) =>
 				stopif not self or not IsValid(self)
 
 				self.title:SetTextColor(theme:get("text"))
