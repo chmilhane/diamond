@@ -88,7 +88,7 @@ public class Diamond.Loader
 
 	public add(path: string, realm: number)
 		local filename = string.StripExtension(self:getPackage().Root .. "/" .. path)
-		local action = Diamond.Loader.realms[realm] ?? Diamond.Loader.realms[DIAMOND_SHARED]
+		local action = Diamond.Loader.Realms[realm] ?? Diamond.Loader.Realms[DIAMOND_SHARED]
 
 		if self.loadedFiles[filename] then
 			return self:log("\t", `- ${filename}: `, Diamond.Loader.Colors.Skipped, "Skipped")
