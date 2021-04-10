@@ -60,8 +60,8 @@ public class Diamond.Collection
     end
 
     first()
-        print(self.tbl)
-        return table.GetFirstValue(self.tbl)
+        local k, v = next(self.tbl)
+        return v, k
     end
 
     get()
