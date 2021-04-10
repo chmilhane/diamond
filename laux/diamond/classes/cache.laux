@@ -1,13 +1,10 @@
 public class Diamond.Cache
     constructor()
         self.cache = {}
-
-        self.exists = self.has
-        self.store = self.set
     end
 
     has(index)
-        return self.cache?[index] and true or false
+        return self.cache[index] and true or false
     end
 
     get(index)
@@ -15,7 +12,7 @@ public class Diamond.Cache
             return self.cache
         end
 
-        return self.cache?[index] 
+        return self.cache[index] 
     end
 
     set(index, value)
@@ -23,8 +20,13 @@ public class Diamond.Cache
         return self
     end
 
-    delete(index)
+    remove(index)
         self.cache[index] = nil
+        return self
+    end
+
+    clear()
+        self.cache = {}
         return self
     end
 end
