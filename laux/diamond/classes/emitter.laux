@@ -1,44 +1,33 @@
-Diamond.Core.Emitter ??= {}
-
-local Emitter = {}
-do
-	function Emitter:emit(event: string|number|table, ...)
-		local name = istable(event) and event?.name or event
-		stopif not self.events[name]
-
-		local t = self.events[name]
-		for i, e in ipairs(t or {}) do
-			e(...)
-		end
-
-		if istable(event) and event?.triggerHook then
-			local prefix = event.prefix or "Diamond"
-			local niceName = name:gsub("^%l", string.upper)
-
-			hook.Run(`${prefix}.${niceName}`, ...)
-		end
+local function on(self, event: string|number, callback)
+	if not self.__events[event] then
+		self.__events[event] = {}
 	end
 
-	function Emitter:on(event: string|number, action)
-		if not self.events[event] then
-			self.events[event] = {}
-		end
-
-		-- local level = 1
-		-- local trace = debug.getinfo(level, "S")
-
-		-- -- prevent duplication
-		-- local index = tostring(trace.short_src .. trace.linedefined .. trace.lastlinedefined)
-		-- self.events[event][index] = action
-		self.events[event][#self.events[event] + 1] = action
-	end
-
-	Emitter.__index = Emitter
+	self.__events[event][#self.__events[event] + 1] = callback
 end
 
-function Diamond.Core.Emitter:register(t = {}: table)
-	setmetatable(t, Emitter)
-	t.events ??= {}
+local function emit(self, event: string|number|table, ...)
+	local name = istable(event) and event?.name or event
+	stopif not self.__events[event]
 
-	return t
+	for i, event in ipairs(self.__events[name] or {}) do
+		event(...)
+	end
+
+	if istable(event) and event?.triggerHook then
+		local prefix = event.prefix or "Diamond"
+		local niceName = name:gsub("^%l", string.upper)
+
+		print(prefix, niceName)
+		hook.Run(`${prefix}.${niceName}`, ...)
+	end
+end
+
+function Diamond:Emitter(base: table)
+	base.__events = {}
+
+	base.on = on
+	base.emit = emit
+
+	return base
 end
