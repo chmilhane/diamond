@@ -1,7 +1,7 @@
 local function main()
 	local BSHADOWS = {}
-  local scrW, scrH = ScrW(), ScrH()
 
+  	local scrW, scrH = ScrW(), ScrH()
 	local resStr = scrW .. "" .. scrH
 
 	BSHADOWS.RenderTarget = GetRenderTarget("bshadows_original_" .. resStr, scrW, scrH)
