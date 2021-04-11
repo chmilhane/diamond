@@ -32,17 +32,17 @@ public class Diamond.Loader
 
 	static Realms = {
 		[DIAMOND_SERVER] = (this, path) =>
-			if (SERVER) then
+			if SERVER then
 				return include(path)
 			end
 		end,
 
 		[DIAMOND_CLIENT] = (this, path) =>
-			if (SERVER) then
-				AddCSLuaFile(path)
-			else
+			if CLIENT then
 				return include(path)
 			end
+
+			AddCSLuaFile(path)
 		end,
 
 		[DIAMOND_SHARED] = (this, ...) =>
@@ -59,7 +59,7 @@ public class Diamond.Loader
 
 		self.startTime = SysTime()
 
-		self:log("Loader initialized, waiting for instructions...")
+		self:diamond_Loader__log("Loader initialized, waiting for instructions...")
 	end
 
 	private log(...)
@@ -91,12 +91,12 @@ public class Diamond.Loader
 		local action = Diamond.Loader.Realms[realm] ?? Diamond.Loader.Realms[DIAMOND_SHARED]
 
 		if self.loadedFiles[filename] then
-			return self:log("\t", `- ${filename}: `, Diamond.Loader.Colors.Skipped, "Skipped")
+			return self:diamond_Loader__log("\t", `- ${filename}: `, Diamond.Loader.Colors.Skipped, "Skipped")
 		end
 		self.loadedFiles[filename] = true
 
 		local content = action(Diamond.Loader.Realms, filename .. ".lua")
-		self:log("\t", `- ${filename}: `, Diamond.Loader.Colors.Success, "Loaded")
+		self:diamond_Loader__log("\t", `- ${filename}: `, Diamond.Loader.Colors.Success, "Loaded")
 
 		return content
 	end
@@ -110,7 +110,7 @@ public class Diamond.Loader
 			path = string.sub(path, #path - 1, #path)
 		end
 
-		local files, directories = file.Find(root .. "/" .. path .. "/*", "LUA")
+		local files, directories = file.Find(self:getPackage().Root .. "/" .. path .. "/*", "LUA")
 
 		for i, v in ipairs(files or {}) do
 			local filename = string.StripExtension(v)
@@ -121,7 +121,7 @@ public class Diamond.Loader
 			local newRealm = options.Realms[filename] or options.Realms[v]
 
 			local fullPath = path .. "/" .. filename
-			files[fullPath] = self:addFile(fullPath, newRealm ?? realm)
+			files[fullPath] = self:add(fullPath, newRealm ?? realm)
 		end
 
 		for i, v in ipairs(directories or {}) do
@@ -142,7 +142,7 @@ public class Diamond.Loader
 			self:downloadAssets(Assets)
 		end
 
-		self:log(
+		self:diamond_Loader__log(
 			"Loaded ",
 			Success, table.Count(self.loadedFiles) .. " files ",
 			Text, "and downloaded ",

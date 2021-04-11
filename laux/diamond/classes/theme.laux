@@ -1,5 +1,8 @@
 class Theme
-    _colors = {
+    _get currentColor
+    _get currentTheme
+
+    static Colors = {
         red = Color(237, 41, 57),
         orange = Color(255, 105, 0),
         yellow = Color(255, 191, 0),
@@ -13,41 +16,69 @@ class Theme
         black = Color(0, 0, 0),
     }
 
-    _themes = {
+    static Themes = {
         light = {
             background = Color(212, 212, 212),
             text = Color(12, 12, 12),
-            radius = 8,
             text = Color(0, 0, 0),
+            radius = 8
         },
+
         dark = {
             background = Color(32, 32, 32),
             text = Color(255, 255, 255),
-            radius = 8,
             text = Color(255, 255, 255),
+            radius = 8
         },
+
         night = {
             background = Color(46, 49, 56),
             text = Color(255, 255, 255),
-            radius = 8,
             text = Color(255, 255, 255),
-        },
+            radius = 8
+        }
     }
 
-    _get currentColor
-    _get currentTheme
-
     constructor()
-        local { root } = Diamond.Package
-        self.path = `${root}/theme.json`
+        self.path = Diamond.Package.Root .. "/theme.json"
 
         local content = util.JSONToTable(file.Read(self.path, "DATA") or "{}")
         self:setCurrentTheme(content.theme or "dark")
         self:setCurrentColor(content.color or "blue")
     end
 
-    get(color)
-        return self._colors[color] or self._themes[self:getCurrentTheme()][color] or IsColor(color) and color or self._colors[self:getCurrentColor()]
+    get(color: string|Color)
+        return Theme.Colors[color] or Theme.Themes[self:getCurrentTheme()][color] or IsColor(color) and color or Theme.colors[self:getCurrentColor()]
+    end
+
+    setCurrentColor(color)
+        stopif not Theme.Colors[color]
+
+        local oldPreference = self.currentColor
+
+        self.currentColor = color
+        self:save()
+
+        hook.Run("Diamond.ColorChanged", oldPreference, color)
+
+        return self
+    end
+
+    setCurrentTheme(theme)
+        stopif not Theme.Themes[theme]
+
+        local oldTheme = self.currentTheme
+
+        self.currentTheme = theme
+        self:save()
+
+        hook.Run("Diamond.ThemeChanged", oldTheme, theme)
+
+        return self
+    end
+
+    getActiveTheme()
+        return Theme.Themes[self:getCurrentTheme()]
     end
 
     lighten(color, fraction, alpha)
@@ -73,42 +104,10 @@ class Theme
         return Color(col.r, col.g, col.b, alpha)
     end
 
-    setCurrentColor(color)
-        stopif not self._colors[color]
-
-        local oldPreference = self.currentColor
-
-        self.currentColor = color
-        self:save()
-
-        hook.Run("Diamond.ColorChanged", oldPreference, color)
-
-        return self
-    end
-
-    setCurrentTheme(theme)
-        stopif not self._themes[theme]
-
-        local oldTheme = self.currentTheme
-
-        self.currentTheme = theme
-        self:save()
-
-        hook.Run("Diamond.ThemeChanged", oldTheme, theme)
-
-        return self
-    end
-
-    getActiveTheme()
-        return self._themes[self:getCurrentTheme()]
-    end
-
-    -- > method used to save current settings
     save()
-        local { root } = Diamond.Package
-
-        if not file.IsDir(root, "DATA") then
-            file.CreateDir(root)
+        local { Root } = Diamond.Package
+        if not file.IsDir(Root, "DATA") then
+            file.CreateDir(Root)
         end
 
         file.Write(self.path, util.TableToJSON({
@@ -117,14 +116,12 @@ class Theme
         }, true))
     end
 
-    list()
+    getList()
         return {
-            ["modes"] = self._themes,
-            ["colors"] = self._colors
+            Themes = Theme.Themes,
+            Colors = Theme.Colors
         }
     end
 end
 
 Diamond.Theme = Theme()
-
--- print(Diamond.Theme:get("blue"))
